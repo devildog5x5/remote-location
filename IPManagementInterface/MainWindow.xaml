@@ -10,7 +10,8 @@
         Title="IP Management Dashboard" 
         Height="900" Width="1400"
         WindowStartupLocation="CenterScreen"
-        Background="{DynamicResource BackgroundBrush}">
+        Background="{DynamicResource BackgroundBrush}"
+        Icon="pack://application:,,,/Resources/TestWrrior.ico">
     
     <Window.Resources>
         <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
@@ -34,7 +35,11 @@
                 </Grid.ColumnDefinitions>
                 
                 <StackPanel Orientation="Horizontal" Grid.Column="0">
-                    <TextBlock Text="🛡️" FontSize="28" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <Image Source="pack://application:,,,/Resources/TestWrrior.ico" 
+                           Width="32" 
+                           Height="32" 
+                           VerticalAlignment="Center" 
+                           Margin="0,0,12,0"/>
                     <TextBlock Text="IP Management Dashboard" 
                                FontSize="24" 
                                FontWeight="Bold" 
@@ -43,15 +48,22 @@
                 </StackPanel>
                 
                 <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right">
-                    <Button Content="⚙️ Settings" 
-                            Click="SettingsButton_Click"
+                    <Button Click="SettingsButton_Click"
                             Margin="5,0"
                             Background="{DynamicResource SurfaceBrush}"
                             Foreground="{DynamicResource TextPrimaryBrush}"
                             BorderBrush="{DynamicResource BorderBrush}"
                             BorderThickness="1"
                             Padding="15,8"
-                            ToolTip="Open Settings"/>
+                            ToolTip="Open Settings">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="pack://application:,,,/Resources/TestWrrior.ico" 
+                                   Width="16" 
+                                   Height="16" 
+                                   Margin="0,0,6,0"/>
+                            <TextBlock Text="Settings" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                     <Button Content="🔍 Discover" 
                             Command="{Binding DiscoverDevicesCommand}"
                             Margin="5,0"
