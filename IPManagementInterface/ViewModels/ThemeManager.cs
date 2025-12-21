@@ -78,26 +78,27 @@ namespace IPManagementInterface.ViewModels
                     // Try pack URI first
                     themeDict = new ResourceDictionary();
                     themeDict.Source = new Uri($"pack://application:,,,/Themes/{themeName}Theme.xaml", UriKind.Absolute);
-                    app.Resources.MergedDictionaries.Add(themeDict);
+                    app.Resources.MergedDictionaries.Insert(0, themeDict); // Insert at beginning to ensure it overrides defaults
                 }
-                catch
+                catch (Exception ex1)
                 {
+                    System.Diagnostics.Debug.WriteLine($"Pack URI failed: {ex1.Message}");
                     try
                     {
                         // Fallback to relative URI
                         themeDict = new ResourceDictionary();
                         themeDict.Source = new Uri($"/Themes/{themeName}Theme.xaml", UriKind.Relative);
-                        app.Resources.MergedDictionaries.Add(themeDict);
+                        app.Resources.MergedDictionaries.Insert(0, themeDict);
                     }
-                    catch (Exception ex)
+                    catch (Exception ex2)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Error loading {themeName}Theme.xaml: {ex.Message}");
+                        System.Diagnostics.Debug.WriteLine($"Relative URI failed: {ex2.Message}");
                         // Fallback to Light theme
                         try
                         {
                             themeDict = new ResourceDictionary();
                             themeDict.Source = new Uri("pack://application:,,,/Themes/LightTheme.xaml", UriKind.Absolute);
-                            app.Resources.MergedDictionaries.Add(themeDict);
+                            app.Resources.MergedDictionaries.Insert(0, themeDict);
                         }
                         catch
                         {
@@ -105,9 +106,12 @@ namespace IPManagementInterface.ViewModels
                             {
                                 themeDict = new ResourceDictionary();
                                 themeDict.Source = new Uri("/Themes/LightTheme.xaml", UriKind.Relative);
-                                app.Resources.MergedDictionaries.Add(themeDict);
+                                app.Resources.MergedDictionaries.Insert(0, themeDict);
                             }
-                            catch { }
+                            catch (Exception ex3)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"All theme loading attempts failed. Last error: {ex3.Message}");
+                            }
                         }
                     }
                 }

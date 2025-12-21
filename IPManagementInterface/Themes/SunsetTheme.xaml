@@ -2,22 +2,22 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Colors.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Themes/Colors.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
     <!-- Sunset Theme - Warm Oranges and Purples -->
-    <Color x:Key="Sunset_Orange">#FF6B35</Color>
-    <Color x:Key="Sunset_Purple">#8B4C9F</Color>
-    <Color x:Key="Sunset_Pink">#FF8C94</Color>
-    <Color x:Key="Sunset_Background">#FFF5F0</Color>
+    <Color x:Key="Sunset_Orange">#FF5722</Color>
+    <Color x:Key="Sunset_Purple">#9C27B0</Color>
+    <Color x:Key="Sunset_Pink">#FF6B9D</Color>
+    <Color x:Key="Sunset_Background">#FFF8F5</Color>
     <Color x:Key="Sunset_Surface">#FFFFFF</Color>
-    <Color x:Key="Sunset_Text">#4A2C2C</Color>
-    <Color x:Key="Sunset_Border">#FFB8A3</Color>
+    <Color x:Key="Sunset_Text">#3E2723</Color>
+    <Color x:Key="Sunset_Border">#FFAB91</Color>
     
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource Sunset_Background}"/>
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource Sunset_Surface}"/>
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource Sunset_Text}"/>
-    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#8A6A6A"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#6D4C41"/>
     <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource Sunset_Border}"/>
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Sunset_Orange}"/>
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Sunset_Purple}"/>

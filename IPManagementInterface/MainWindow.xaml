@@ -50,18 +50,22 @@
                 <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right">
                     <Button Click="SettingsButton_Click"
                             Margin="5,0"
-                            Background="{DynamicResource SurfaceBrush}"
-                            Foreground="{DynamicResource TextPrimaryBrush}"
-                            BorderBrush="{DynamicResource BorderBrush}"
+                            Background="{DynamicResource PrimaryBrush}"
+                            Foreground="White"
+                            BorderBrush="{DynamicResource PrimaryBrush}"
                             BorderThickness="1"
                             Padding="15,8"
-                            ToolTip="Open Settings">
+                            FontWeight="SemiBold"
+                            Cursor="Hand"
+                            ToolTip="Open Settings - Change Theme">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="pack://application:,,,/Resources/TestWrrior.ico" 
-                                   Width="16" 
-                                   Height="16" 
-                                   Margin="0,0,6,0"/>
-                            <TextBlock Text="Settings" VerticalAlignment="Center"/>
+                            <TextBlock Text="⚙️" 
+                                       FontSize="16" 
+                                       Margin="0,0,6,0"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="Settings" 
+                                       VerticalAlignment="Center"
+                                       FontSize="14"/>
                         </StackPanel>
                     </Button>
                     <Button Content="🔍 Discover" 
