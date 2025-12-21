@@ -19,7 +19,7 @@ namespace IPManagementInterface.Views
             SetSelectedTheme(_mainViewModel.CurrentTheme);
         }
 
-        private void SetSelectedTheme(ThemeType theme)
+        private void SetSelectedTheme(ViewModels.ThemeType theme)
         {
             var themeName = theme.ToString();
             
@@ -35,7 +35,7 @@ namespace IPManagementInterface.Views
         {
             if (sender is RadioButton radioButton && radioButton.Tag is string themeName)
             {
-                if (Enum.TryParse<ThemeType>(themeName, out var theme))
+                if (Enum.TryParse<ViewModels.ThemeType>(themeName, out var theme))
                 {
                     _mainViewModel.ChangeThemeCommand.Execute(theme);
                 }
