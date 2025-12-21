@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "GkXa8KIwj7I=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\rober\\Documents\\GitHub\\IPManagementInterface\\IPManagementInterface\\IPManagementInterface.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\rober\\.nuget\\packages\\communitytoolkit.mvvm\\8.2.2\\communitytoolkit.mvvm.8.2.2.nupkg.sha512",
+    "C:\\Users\\rober\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

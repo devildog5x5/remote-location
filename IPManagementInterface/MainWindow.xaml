@@ -1,0 +1,552 @@
+<Window x:Class="IPManagementInterface.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IPManagementInterface"
+        xmlns:converters="clr-namespace:IPManagementInterface.Converters"
+        xmlns:models="clr-namespace:IPManagementInterface.Models"
+        mc:Ignorable="d"
+        Title="IP Management Dashboard" 
+        Height="900" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource BackgroundBrush}">
+    
+    <Window.Resources>
+        <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header with Theme Selector -->
+        <Border Grid.Row="0" 
+                Background="{DynamicResource PrimaryBrush}" 
+                Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                    <TextBlock Text="🛡️" FontSize="28" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <TextBlock Text="IP Management Dashboard" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="White"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right">
+                    <ComboBox x:Name="ThemeSelector" 
+                              Width="150" 
+                              Margin="5,0"
+                              SelectionChanged="ThemeSelector_SelectionChanged">
+                        <ComboBoxItem Content="Light" Tag="Light"/>
+                        <ComboBoxItem Content="Dark" Tag="Dark"/>
+                        <ComboBoxItem Content="USMC" Tag="USMC"/>
+                        <ComboBoxItem Content="Olive Drab" Tag="OliveDrab"/>
+                        <ComboBoxItem Content="Ocean" Tag="Ocean"/>
+                        <ComboBoxItem Content="Sunset" Tag="Sunset"/>
+                    </ComboBox>
+                    <Button Content="🔍 Discover" 
+                            Command="{Binding DiscoverDevicesCommand}"
+                            Margin="5,0"
+                            Background="{DynamicResource AccentBrush}"
+                            Foreground="White"
+                            Padding="15,8"/>
+                    <Button Content="➕ Add Device" 
+                            Command="{Binding AddDeviceCommand}"
+                            Margin="5,0"
+                            Background="{DynamicResource AccentBrush}"
+                            Foreground="White"
+                            Padding="15,8"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Dashboard Content -->
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="350"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Device List Panel with Tabs -->
+            <Border Grid.Column="0" 
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Statistics -->
+                    <StackPanel Grid.Row="0" Margin="15,15,15,10">
+                        <TextBlock Text="Device Statistics" 
+                                   FontWeight="Bold" 
+                                   FontSize="16" 
+                                   Margin="0,0,0,10"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding AllDevices.Count, StringFormat='Total: {0}'}" 
+                                           FontSize="12" 
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding CameraDevices.Count, StringFormat='Cameras: {0}'}" 
+                                           FontSize="12" 
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding NetworkDevices.Count, StringFormat='Network: {0}'}" 
+                                           FontSize="12" 
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding ServerDevices.Count, StringFormat='Servers: {0}'}" 
+                                           FontSize="12" 
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Discovery Filters -->
+                    <Border Grid.Row="1" 
+                            Background="{DynamicResource BackgroundBrush}" 
+                            Padding="15,10"
+                            Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="Discovery Filters" 
+                                       FontWeight="SemiBold" 
+                                       FontSize="12" 
+                                       Margin="0,0,0,8"/>
+                            <ComboBox x:Name="DeviceTypeFilter" 
+                                      Margin="0,0,0,8"
+                                      SelectionChanged="DeviceTypeFilter_SelectionChanged">
+                                <ComboBoxItem Content="All Types" Tag=""/>
+                                <ComboBoxItem Content="Camera" Tag="Camera"/>
+                                <ComboBoxItem Content="Router" Tag="Router"/>
+                                <ComboBoxItem Content="Switch" Tag="Switch"/>
+                                <ComboBoxItem Content="Access Point" Tag="AccessPoint"/>
+                                <ComboBoxItem Content="Server" Tag="Server"/>
+                                <ComboBoxItem Content="Printer" Tag="Printer"/>
+                                <ComboBoxItem Content="Other" Tag="Other"/>
+                            </ComboBox>
+                            <TextBox Text="{Binding DiscoveryFilterGroup, UpdateSourceTrigger=PropertyChanged}" 
+                                     Padding="8"
+                                     Margin="0,0,0,8"
+                                     ToolTip="Group filter (optional)"/>
+                            <TextBlock Text="{Binding DiscoveryStatus}" 
+                                       FontSize="11" 
+                                       Foreground="{DynamicResource AccentBrush}"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Tabbed Device Lists -->
+                    <TabControl Grid.Row="2" 
+                                SelectedIndex="{Binding SelectedTabIndex}"
+                                BorderThickness="0">
+                        <TabItem Header="All">
+                            <ListBox ItemsSource="{Binding AllDevices}"
+                                     SelectedItem="{Binding SelectedDevice}"
+                                     BorderThickness="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource BackgroundBrush}"
+                                                CornerRadius="4"
+                                                Padding="12"
+                                                Margin="8,4"
+                                                BorderThickness="1"
+                                                BorderBrush="{DynamicResource BorderBrush}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock Grid.Row="0" 
+                                                           Text="{Binding Name}" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="14"/>
+                                                <Ellipse Grid.Row="0" 
+                                                         Grid.Column="1" 
+                                                         Width="12" 
+                                                         Height="12" 
+                                                         Margin="5,0,0,0">
+                                                    <Ellipse.Fill>
+                                                        <SolidColorBrush Color="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
+                                                    </Ellipse.Fill>
+                                                </Ellipse>
+                                                
+                                                <TextBlock Grid.Row="1" 
+                                                           Text="{Binding IpAddress}" 
+                                                           FontSize="12" 
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Margin="0,4,0,0"/>
+                                                <TextBlock Grid.Row="2" 
+                                                           Text="{Binding DeviceType}" 
+                                                           FontSize="11" 
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Margin="0,2,0,0"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </TabItem>
+                        
+                        <TabItem Header="📷 Cameras">
+                            <ListBox ItemsSource="{Binding CameraDevices}"
+                                     SelectedItem="{Binding SelectedDevice}"
+                                     BorderThickness="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource BackgroundBrush}"
+                                                CornerRadius="4"
+                                                Padding="12"
+                                                Margin="8,4"
+                                                BorderThickness="1"
+                                                BorderBrush="{DynamicResource BorderBrush}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock Grid.Row="0" 
+                                                           Text="{Binding Name}" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="14"/>
+                                                <Ellipse Grid.Row="0" 
+                                                         Grid.Column="1" 
+                                                         Width="12" 
+                                                         Height="12" 
+                                                         Margin="5,0,0,0">
+                                                    <Ellipse.Fill>
+                                                        <SolidColorBrush Color="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
+                                                    </Ellipse.Fill>
+                                                </Ellipse>
+                                                
+                                                <TextBlock Grid.Row="1" 
+                                                           Text="{Binding IpAddress}" 
+                                                           FontSize="12" 
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Margin="0,4,0,0"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </TabItem>
+                        
+                        <TabItem Header="🌐 Network">
+                            <ListBox ItemsSource="{Binding NetworkDevices}"
+                                     SelectedItem="{Binding SelectedDevice}"
+                                     BorderThickness="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource BackgroundBrush}"
+                                                CornerRadius="4"
+                                                Padding="12"
+                                                Margin="8,4"
+                                                BorderThickness="1"
+                                                BorderBrush="{DynamicResource BorderBrush}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock Grid.Row="0" 
+                                                           Text="{Binding Name}" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="14"/>
+                                                <Ellipse Grid.Row="0" 
+                                                         Grid.Column="1" 
+                                                         Width="12" 
+                                                         Height="12" 
+                                                         Margin="5,0,0,0">
+                                                    <Ellipse.Fill>
+                                                        <SolidColorBrush Color="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
+                                                    </Ellipse.Fill>
+                                                </Ellipse>
+                                                
+                                                <TextBlock Grid.Row="1" 
+                                                           Text="{Binding IpAddress}" 
+                                                           FontSize="12" 
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Margin="0,4,0,0"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </TabItem>
+                        
+                        <TabItem Header="🖥️ Servers">
+                            <ListBox ItemsSource="{Binding ServerDevices}"
+                                     SelectedItem="{Binding SelectedDevice}"
+                                     BorderThickness="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource BackgroundBrush}"
+                                                CornerRadius="4"
+                                                Padding="12"
+                                                Margin="8,4"
+                                                BorderThickness="1"
+                                                BorderBrush="{DynamicResource BorderBrush}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock Grid.Row="0" 
+                                                           Text="{Binding Name}" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="14"/>
+                                                <Ellipse Grid.Row="0" 
+                                                         Grid.Column="1" 
+                                                         Width="12" 
+                                                         Height="12" 
+                                                         Margin="5,0,0,0">
+                                                    <Ellipse.Fill>
+                                                        <SolidColorBrush Color="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
+                                                    </Ellipse.Fill>
+                                                </Ellipse>
+                                                
+                                                <TextBlock Grid.Row="1" 
+                                                           Text="{Binding IpAddress}" 
+                                                           FontSize="12" 
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Margin="0,4,0,0"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </TabItem>
+                        
+                        <TabItem Header="📦 Other">
+                            <ListBox ItemsSource="{Binding OtherDevices}"
+                                     SelectedItem="{Binding SelectedDevice}"
+                                     BorderThickness="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource BackgroundBrush}"
+                                                CornerRadius="4"
+                                                Padding="12"
+                                                Margin="8,4"
+                                                BorderThickness="1"
+                                                BorderBrush="{DynamicResource BorderBrush}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock Grid.Row="0" 
+                                                           Text="{Binding Name}" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="14"/>
+                                                <Ellipse Grid.Row="0" 
+                                                         Grid.Column="1" 
+                                                         Width="12" 
+                                                         Height="12" 
+                                                         Margin="5,0,0,0">
+                                                    <Ellipse.Fill>
+                                                        <SolidColorBrush Color="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
+                                                    </Ellipse.Fill>
+                                                </Ellipse>
+                                                
+                                                <TextBlock Grid.Row="1" 
+                                                           Text="{Binding IpAddress}" 
+                                                           FontSize="12" 
+                                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                                           Margin="0,4,0,0"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </TabItem>
+                    </TabControl>
+
+                    <!-- Actions -->
+                    <StackPanel Grid.Row="3" 
+                                Orientation="Horizontal" 
+                                HorizontalAlignment="Right"
+                                Margin="15,10,15,15">
+                        <Button Content="🔄 Refresh" 
+                                Command="{Binding RefreshDeviceCommand}"
+                                Margin="5,0"
+                                Padding="12,6"/>
+                        <Button Content="🗑️ Remove" 
+                                Command="{Binding RemoveDeviceCommand}"
+                                Margin="5,0"
+                                Padding="12,6"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Device Details Panel -->
+            <Border Grid.Column="2" 
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20">
+                <ScrollViewer>
+                    <StackPanel>
+                        <TextBlock Text="Device Details" 
+                                   FontSize="24" 
+                                   FontWeight="Bold" 
+                                   Margin="0,0,0,20"/>
+
+                        <TextBlock Text="Device Name" 
+                                   FontWeight="SemiBold" 
+                                   Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding SelectedDevice.Name, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                 Margin="0,0,0,15"
+                                 Padding="10"/>
+
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="IP Address" 
+                                           FontWeight="SemiBold" 
+                                           Margin="0,0,0,5"/>
+                                <TextBox Text="{Binding SelectedDevice.IpAddress, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                         Padding="10"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Port" 
+                                           FontWeight="SemiBold" 
+                                           Margin="0,0,0,5"/>
+                                <TextBox Text="{Binding SelectedDevice.Port, UpdateSourceTrigger=PropertyChanged, TargetNullValue='0'}"
+                                         Padding="10"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="Protocol" 
+                                   FontWeight="SemiBold" 
+                                   Margin="0,0,0,5"/>
+                        <ComboBox SelectedValue="{Binding SelectedDevice.Protocol, UpdateSourceTrigger=PropertyChanged, TargetNullValue='http'}"
+                                  SelectedValuePath="Content"
+                                  Margin="0,0,0,15"
+                                  Padding="10">
+                            <ComboBoxItem Content="http"/>
+                            <ComboBoxItem Content="https"/>
+                        </ComboBox>
+
+                        <TextBlock Text="Device Type" 
+                                   FontWeight="SemiBold" 
+                                   Margin="0,0,0,5"/>
+                        <ComboBox SelectedValue="{Binding SelectedDevice.DeviceType, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Tag"
+                                  Margin="0,0,0,15"
+                                  Padding="10">
+                            <ComboBoxItem Content="Camera" Tag="Camera"/>
+                            <ComboBoxItem Content="Router" Tag="Router"/>
+                            <ComboBoxItem Content="Switch" Tag="Switch"/>
+                            <ComboBoxItem Content="Access Point" Tag="AccessPoint"/>
+                            <ComboBoxItem Content="Server" Tag="Server"/>
+                            <ComboBoxItem Content="Printer" Tag="Printer"/>
+                            <ComboBoxItem Content="Other" Tag="Other"/>
+                        </ComboBox>
+
+                        <Border Background="{DynamicResource BackgroundBrush}" 
+                                CornerRadius="4" 
+                                Padding="15"
+                                BorderThickness="1"
+                                BorderBrush="{DynamicResource BorderBrush}">
+                            <StackPanel>
+                                <TextBlock Text="Status Information" 
+                                           FontWeight="Bold" 
+                                           FontSize="16" 
+                                           Margin="0,0,0,15"/>
+                                
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" 
+                                               Text="Status:" 
+                                               FontWeight="SemiBold" 
+                                               Margin="0,0,10,10"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" 
+                                               Text="{Binding SelectedDevice.Status, TargetNullValue='Unknown'}" 
+                                               Margin="0,0,0,10"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" 
+                                               Text="Last Seen:" 
+                                               FontWeight="SemiBold" 
+                                               Margin="0,0,10,10"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" 
+                                               Text="{Binding SelectedDevice.LastSeen, TargetNullValue='Never'}" 
+                                               Margin="0,0,0,10"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" 
+                                               Text="Group:" 
+                                               FontWeight="SemiBold" 
+                                               Margin="0,0,10,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" 
+                                             Text="{Binding SelectedDevice.Group, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                             Padding="8"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

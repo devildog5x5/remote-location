@@ -1,0 +1,2 @@
+C:\Users\rober\Documents\GitHub\IPManagementInterface\IPManagementInterface\bin\Release\net8.0-windows\win-x64\publish\IPManagementInterface.pdb
+C:\Users\rober\Documents\GitHub\IPManagementInterface\IPManagementInterface\bin\Release\net8.0-windows\win-x64\publish\IPManagementInterface.exe
