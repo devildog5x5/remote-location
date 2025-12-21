@@ -244,6 +244,9 @@ namespace IPManagementInterface.ViewModels
                 CurrentTheme = theme;
                 _themeManager.SaveTheme(theme);
                 _themeManager.ApplyTheme(theme);
+                
+                // Force property notification
+                OnPropertyChanged(nameof(CurrentTheme));
             }
         }
     }

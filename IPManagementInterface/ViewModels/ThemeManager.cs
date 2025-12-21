@@ -69,9 +69,13 @@ namespace IPManagementInterface.ViewModels
                     app.Resources.MergedDictionaries.Remove(dict);
                 }
 
+                // Small delay to ensure removal is complete
+                System.Threading.Thread.Sleep(50);
+
                 // Load theme-specific resources (which already include Colors.xaml via MergedDictionaries)
                 var themeName = theme.ToString();
                 ResourceDictionary themeDict = null;
+                bool loaded = false;
                 
                 try
                 {
@@ -79,6 +83,8 @@ namespace IPManagementInterface.ViewModels
                     themeDict = new ResourceDictionary();
                     themeDict.Source = new Uri($"pack://application:,,,/Themes/{themeName}Theme.xaml", UriKind.Absolute);
                     app.Resources.MergedDictionaries.Insert(0, themeDict); // Insert at beginning to ensure it overrides defaults
+                    loaded = true;
+                    System.Diagnostics.Debug.WriteLine($"Successfully loaded {themeName}Theme.xaml using pack URI");
                 }
                 catch (Exception ex1)
                 {
@@ -89,6 +95,8 @@ namespace IPManagementInterface.ViewModels
                         themeDict = new ResourceDictionary();
                         themeDict.Source = new Uri($"/Themes/{themeName}Theme.xaml", UriKind.Relative);
                         app.Resources.MergedDictionaries.Insert(0, themeDict);
+                        loaded = true;
+                        System.Diagnostics.Debug.WriteLine($"Successfully loaded {themeName}Theme.xaml using relative URI");
                     }
                     catch (Exception ex2)
                     {
@@ -99,6 +107,7 @@ namespace IPManagementInterface.ViewModels
                             themeDict = new ResourceDictionary();
                             themeDict.Source = new Uri("pack://application:,,,/Themes/LightTheme.xaml", UriKind.Absolute);
                             app.Resources.MergedDictionaries.Insert(0, themeDict);
+                            loaded = true;
                         }
                         catch
                         {
@@ -107,6 +116,7 @@ namespace IPManagementInterface.ViewModels
                                 themeDict = new ResourceDictionary();
                                 themeDict.Source = new Uri("/Themes/LightTheme.xaml", UriKind.Relative);
                                 app.Resources.MergedDictionaries.Insert(0, themeDict);
+                                loaded = true;
                             }
                             catch (Exception ex3)
                             {
@@ -114,6 +124,32 @@ namespace IPManagementInterface.ViewModels
                             }
                         }
                     }
+                }
+
+                // Force refresh of all windows to apply the new theme
+                if (loaded)
+                {
+                    app.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        // Update all existing windows
+                        foreach (Window window in app.Windows)
+                        {
+                            if (window != null && window.IsLoaded)
+                            {
+                                // Force resource refresh
+                                var resources = window.Resources;
+                                window.Resources = null;
+                                window.Resources = resources;
+                                
+                                // Force visual refresh
+                                window.UpdateLayout();
+                                window.InvalidateVisual();
+                            }
+                        }
+                        
+                        // Also update the main application resources directly
+                        app.Resources = app.Resources;
+                    }), System.Windows.Threading.DispatcherPriority.Loaded);
                 }
             }
             catch (Exception ex)
