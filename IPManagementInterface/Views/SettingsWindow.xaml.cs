@@ -17,6 +17,15 @@ namespace IPManagementInterface.Views
 
             // Set the current theme as selected
             SetSelectedTheme(_mainViewModel.CurrentTheme);
+            
+            // Subscribe to theme changes to update UI
+            _mainViewModel.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(DashboardViewModel.CurrentTheme))
+                {
+                    SetSelectedTheme(_mainViewModel.CurrentTheme);
+                }
+            };
         }
 
         private void SetSelectedTheme(ViewModels.ThemeType theme)
@@ -37,7 +46,11 @@ namespace IPManagementInterface.Views
             {
                 if (Enum.TryParse<ViewModels.ThemeType>(themeName, out var theme))
                 {
-                    _mainViewModel.ChangeThemeCommand.Execute(theme);
+                    // Execute the command to change theme
+                    if (_mainViewModel.ChangeThemeCommand.CanExecute(theme))
+                    {
+                        _mainViewModel.ChangeThemeCommand.Execute(theme);
+                    }
                 }
             }
         }

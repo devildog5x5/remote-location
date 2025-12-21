@@ -51,7 +51,17 @@ namespace IPManagementInterface.ViewModels
             {
                 // Clear existing theme dictionaries
                 var dictionariesToRemove = app.Resources.MergedDictionaries
-                    .Where(d => d.Source != null && d.Source.ToString().Contains("Themes/"))
+                    .Where(d => d.Source != null)
+                    .Where(d => {
+                        var source = d.Source.ToString();
+                        return source.Contains("Themes/Colors.xaml") ||
+                               source.Contains("Themes/LightTheme.xaml") ||
+                               source.Contains("Themes/DarkTheme.xaml") ||
+                               source.Contains("Themes/USMCTheme.xaml") ||
+                               source.Contains("Themes/OliveDrabTheme.xaml") ||
+                               source.Contains("Themes/OceanTheme.xaml") ||
+                               source.Contains("Themes/SunsetTheme.xaml");
+                    })
                     .ToList();
                 
                 foreach (var dict in dictionariesToRemove)
@@ -59,38 +69,53 @@ namespace IPManagementInterface.ViewModels
                     app.Resources.MergedDictionaries.Remove(dict);
                 }
 
-                // Load base colors
+                // Load theme-specific resources (which already include Colors.xaml via MergedDictionaries)
+                var themeName = theme.ToString();
+                ResourceDictionary themeDict = null;
+                
                 try
                 {
-                    app.Resources.MergedDictionaries.Add(
-                        new ResourceDictionary { Source = new Uri("/Themes/Colors.xaml", UriKind.Relative) }
-                    );
-                }
-                catch { }
-
-                // Load theme-specific resources
-                try
-                {
-                    var themeName = theme.ToString();
-                    app.Resources.MergedDictionaries.Add(
-                        new ResourceDictionary { Source = new Uri($"/Themes/{themeName}Theme.xaml", UriKind.Relative) }
-                    );
+                    // Try pack URI first
+                    themeDict = new ResourceDictionary();
+                    themeDict.Source = new Uri($"pack://application:,,,/Themes/{themeName}Theme.xaml", UriKind.Absolute);
+                    app.Resources.MergedDictionaries.Add(themeDict);
                 }
                 catch
                 {
-                    // Fallback to Light theme
                     try
                     {
-                        app.Resources.MergedDictionaries.Add(
-                            new ResourceDictionary { Source = new Uri("/Themes/LightTheme.xaml", UriKind.Relative) }
-                        );
+                        // Fallback to relative URI
+                        themeDict = new ResourceDictionary();
+                        themeDict.Source = new Uri($"/Themes/{themeName}Theme.xaml", UriKind.Relative);
+                        app.Resources.MergedDictionaries.Add(themeDict);
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error loading {themeName}Theme.xaml: {ex.Message}");
+                        // Fallback to Light theme
+                        try
+                        {
+                            themeDict = new ResourceDictionary();
+                            themeDict.Source = new Uri("pack://application:,,,/Themes/LightTheme.xaml", UriKind.Absolute);
+                            app.Resources.MergedDictionaries.Add(themeDict);
+                        }
+                        catch
+                        {
+                            try
+                            {
+                                themeDict = new ResourceDictionary();
+                                themeDict.Source = new Uri("/Themes/LightTheme.xaml", UriKind.Relative);
+                                app.Resources.MergedDictionaries.Add(themeDict);
+                            }
+                            catch { }
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Theme application error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
             }
         }
     }
