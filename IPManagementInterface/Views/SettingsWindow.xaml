@@ -1,0 +1,153 @@
+<Window x:Class="IPManagementInterface.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Settings" 
+        Height="550" Width="450"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BackgroundBrush}"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="⚙️ Settings" 
+                       FontSize="24" 
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       Margin="0,0,0,10"/>
+            <TextBlock Text="Customize your application appearance" 
+                       FontSize="14"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <!-- Theme Selection -->
+        <Border Grid.Row="1" 
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20">
+            <StackPanel>
+                <TextBlock Text="Theme / View" 
+                           FontSize="18" 
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           Margin="0,0,0,15"/>
+
+                <!-- Theme Options -->
+                <RadioButton x:Name="LightTheme" 
+                             Content="☀️ Light - Welcoming and bright" 
+                             Tag="Light"
+                             FontSize="14"
+                             Margin="0,0,0,12"
+                             Padding="5,8"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Checked="ThemeRadioButton_Checked"/>
+                
+                <RadioButton x:Name="DarkTheme" 
+                             Content="🌙 Dark - Easy on the eyes" 
+                             Tag="Dark"
+                             FontSize="14"
+                             Margin="0,0,0,12"
+                             Padding="5,8"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Checked="ThemeRadioButton_Checked"/>
+                
+                <RadioButton x:Name="USMCTheme" 
+                             Content="🛡️ USMC - Red, Gold, and Blue" 
+                             Tag="USMC"
+                             FontSize="14"
+                             Margin="0,0,0,12"
+                             Padding="5,8"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Checked="ThemeRadioButton_Checked"/>
+                
+                <RadioButton x:Name="OliveDrabTheme" 
+                             Content="🪖 Olive Drab - Military Green" 
+                             Tag="OliveDrab"
+                             FontSize="14"
+                             Margin="0,0,0,12"
+                             Padding="5,8"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Checked="ThemeRadioButton_Checked"/>
+                
+                <RadioButton x:Name="OceanTheme" 
+                             Content="🌊 Ocean - Calming Blues and Teals" 
+                             Tag="Ocean"
+                             FontSize="14"
+                             Margin="0,0,0,12"
+                             Padding="5,8"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Checked="ThemeRadioButton_Checked"/>
+                
+                <RadioButton x:Name="SunsetTheme" 
+                             Content="🌅 Sunset - Warm Oranges and Purples" 
+                             Tag="Sunset"
+                             FontSize="14"
+                             Margin="0,0,0,12"
+                             Padding="5,8"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             Checked="ThemeRadioButton_Checked"/>
+
+                <!-- Theme Preview -->
+                <Border Background="{DynamicResource BackgroundBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="15"
+                        Margin="0,15,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Preview" 
+                                   FontWeight="SemiBold"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Margin="0,0,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0"
+                                    Background="{DynamicResource PrimaryBrush}"
+                                    CornerRadius="4"
+                                    Padding="10"
+                                    Margin="0,0,5,0">
+                                <TextBlock Text="Primary Color" 
+                                           Foreground="White"
+                                           FontSize="11"/>
+                            </Border>
+                            <Border Grid.Column="1"
+                                    Background="{DynamicResource AccentBrush}"
+                                    CornerRadius="4"
+                                    Padding="10">
+                                <TextBlock Text="Accent Color" 
+                                           Foreground="White"
+                                           FontSize="11"/>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- Close Button -->
+        <Button Grid.Row="2" 
+                Content="Close" 
+                HorizontalAlignment="Right"
+                Width="100"
+                Height="35"
+                Margin="0,20,0,0"
+                Click="CloseButton_Click"
+                Background="{DynamicResource PrimaryBrush}"
+                Foreground="White"/>
+    </Grid>
+</Window>

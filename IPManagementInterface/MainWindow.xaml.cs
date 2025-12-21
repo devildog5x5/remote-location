@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using IPManagementInterface.ViewModels;
 using IPManagementInterface.Models;
+using IPManagementInterface.Views;
 
 namespace IPManagementInterface
 {
@@ -15,28 +16,12 @@ namespace IPManagementInterface
             InitializeComponent();
             _viewModel = new DashboardViewModel();
             DataContext = _viewModel;
-
-            // Set initial theme in selector
-            var themeName = _viewModel.CurrentTheme.ToString();
-            foreach (ComboBoxItem item in ThemeSelector.Items)
-            {
-                if (item.Tag?.ToString() == themeName)
-                {
-                    ThemeSelector.SelectedItem = item;
-                    break;
-                }
-            }
         }
 
-        private void ThemeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ThemeSelector.SelectedItem is ComboBoxItem item && item.Tag is string themeName)
-            {
-                if (Enum.TryParse<ViewModels.ThemeType>(themeName, out var theme))
-                {
-                    _viewModel.ChangeThemeCommand.Execute(theme);
-                }
-            }
+            var settingsWindow = new SettingsWindow(_viewModel);
+            settingsWindow.ShowDialog();
         }
 
         private void DeviceTypeFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)

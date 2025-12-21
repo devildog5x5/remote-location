@@ -43,17 +43,15 @@
                 </StackPanel>
                 
                 <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right">
-                    <ComboBox x:Name="ThemeSelector" 
-                              Width="150" 
-                              Margin="5,0"
-                              SelectionChanged="ThemeSelector_SelectionChanged">
-                        <ComboBoxItem Content="Light" Tag="Light"/>
-                        <ComboBoxItem Content="Dark" Tag="Dark"/>
-                        <ComboBoxItem Content="USMC" Tag="USMC"/>
-                        <ComboBoxItem Content="Olive Drab" Tag="OliveDrab"/>
-                        <ComboBoxItem Content="Ocean" Tag="Ocean"/>
-                        <ComboBoxItem Content="Sunset" Tag="Sunset"/>
-                    </ComboBox>
+                    <Button Content="⚙️ Settings" 
+                            Click="SettingsButton_Click"
+                            Margin="5,0"
+                            Background="{DynamicResource SurfaceBrush}"
+                            Foreground="{DynamicResource TextPrimaryBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            Padding="15,8"
+                            ToolTip="Open Settings"/>
                     <Button Content="🔍 Discover" 
                             Command="{Binding DiscoverDevicesCommand}"
                             Margin="5,0"
