@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 using Microsoft.Win32;
 
 namespace IPManagementInterface.ViewModels
@@ -127,28 +128,43 @@ namespace IPManagementInterface.ViewModels
                 }
 
                 // Force refresh of all windows to apply the new theme
-                if (loaded)
+                if (loaded && themeDict != null)
                 {
                     app.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        // Update all existing windows
-                        foreach (Window window in app.Windows)
+                        try
                         {
-                            if (window != null && window.IsLoaded)
+                            // Update all existing windows
+                            foreach (Window window in app.Windows)
                             {
-                                // Force resource refresh
-                                var resources = window.Resources;
-                                window.Resources = null;
-                                window.Resources = resources;
-                                
-                                // Force visual refresh
-                                window.UpdateLayout();
-                                window.InvalidateVisual();
+                                if (window != null && window.IsLoaded)
+                                {
+                                    // Force resource refresh by creating a new ResourceDictionary
+                                    var oldResources = window.Resources;
+                                    if (oldResources != null)
+                                    {
+                                        var newResources = new ResourceDictionary();
+                                        foreach (System.Collections.DictionaryEntry entry in oldResources)
+                                        {
+                                            newResources[entry.Key] = entry.Value;
+                                        }
+                                        window.Resources = newResources;
+                                    }
+                                    
+                                    // Force visual refresh
+                                    window.UpdateLayout();
+                                    window.InvalidateVisual();
+                                    
+                                    // Force measure and arrange
+                                    window.InvalidateMeasure();
+                                    window.InvalidateArrange();
+                                }
                             }
                         }
-                        
-                        // Also update the main application resources directly
-                        app.Resources = app.Resources;
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Error refreshing windows: {ex.Message}");
+                        }
                     }), System.Windows.Threading.DispatcherPriority.Loaded);
                 }
             }
