@@ -15,6 +15,10 @@
     
     <Window.Resources>
         <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
+        <converters:BoolToMonitoringTextConverter x:Key="BoolToMonitoringTextConverter"/>
+        <converters:BoolToMonitoringColorConverter x:Key="BoolToMonitoringColorConverter"/>
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+        <converters:TagsToStringConverter x:Key="TagsToStringConverter"/>
     </Window.Resources>
     
     <Grid>
@@ -23,18 +27,22 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Header with Theme Selector -->
+        <!-- Header with Search and Actions -->
         <Border Grid.Row="0" 
                 Background="{DynamicResource PrimaryBrush}" 
                 Padding="20,15">
             <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 
-                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
                     <Image Source="pack://application:,,,/Resources/TestWrrior.ico" 
                            Width="32" 
                            Height="32" 
@@ -47,7 +55,43 @@
                                VerticalAlignment="Center"/>
                 </StackPanel>
                 
-                <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right">
+                <!-- Search Bar -->
+                <Border Grid.Row="0" Grid.Column="1" 
+                        Background="White" 
+                        CornerRadius="4" 
+                        Padding="10,8" 
+                        Margin="20,0"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🔍" 
+                                   FontSize="14" 
+                                   Margin="0,0,8,0" 
+                                   VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                 Background="Transparent" 
+                                 BorderThickness="0"
+                                 FontSize="14"
+                                 VerticalContentAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 Padding="0">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="TextBox">
+                                                <Border Background="{TemplateBinding Background}">
+                                                    <ScrollViewer x:Name="PART_ContentHost" Margin="0"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                    </StackPanel>
+                </Border>
+                
+                <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right">
                     <Button Click="SettingsButton_Click"
                             Margin="5,0"
                             Background="{DynamicResource PrimaryBrush}"
@@ -57,7 +101,7 @@
                             Padding="15,8"
                             FontWeight="SemiBold"
                             Cursor="Hand"
-                            ToolTip="Open Settings - Change Theme">
+                            ToolTip="Open Settings">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="⚙️" 
                                        FontSize="16" 
@@ -74,12 +118,52 @@
                             Background="{DynamicResource AccentBrush}"
                             Foreground="White"
                             Padding="15,8"/>
-                    <Button Content="➕ Add Device" 
+                    <Button Content="➕ Add" 
                             Command="{Binding AddDeviceCommand}"
                             Margin="5,0"
                             Background="{DynamicResource AccentBrush}"
                             Foreground="White"
                             Padding="15,8"/>
+                </StackPanel>
+
+                <!-- Quick Actions Toolbar -->
+                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" 
+                            Orientation="Horizontal" 
+                            Margin="0,10,0,0"
+                            HorizontalAlignment="Left">
+                    <Button Content="📊 Stats" 
+                            Command="{Binding ShowStatisticsCommand}"
+                            Margin="5,0"
+                            Background="{DynamicResource SurfaceBrush}"
+                            Foreground="{DynamicResource TextPrimaryBrush}"
+                            Padding="10,6"
+                            ToolTip="View Statistics"/>
+                    <Button Content="📥 Export" 
+                            Click="ExportButton_Click"
+                            Margin="5,0"
+                            Background="{DynamicResource SurfaceBrush}"
+                            Foreground="{DynamicResource TextPrimaryBrush}"
+                            Padding="10,6"
+                            ToolTip="Export Devices"/>
+                    <Button Content="📤 Import" 
+                            Click="ImportButton_Click"
+                            Margin="5,0"
+                            Background="{DynamicResource SurfaceBrush}"
+                            Foreground="{DynamicResource TextPrimaryBrush}"
+                            Padding="10,6"
+                            ToolTip="Import Devices"/>
+                    <Button Content="{Binding IsMonitoring, Converter={StaticResource BoolToMonitoringTextConverter}}" 
+                            Command="{Binding ToggleMonitoringCommand}"
+                            Margin="5,0"
+                            Background="{Binding IsMonitoring, Converter={StaticResource BoolToMonitoringColorConverter}}"
+                            Foreground="White"
+                            Padding="10,6"
+                            ToolTip="Toggle Auto-Monitoring"/>
+                    <TextBlock Text="{Binding SelectedDevices.Count, StringFormat='{}Selected: {0}'}" 
+                               VerticalAlignment="Center"
+                               Margin="10,0,0,0"
+                               Foreground="White"
+                               FontSize="12"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -103,7 +187,9 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
@@ -170,6 +256,36 @@
                         </StackPanel>
                     </Border>
 
+                    <!-- View Filters -->
+                    <Border Grid.Row="1" 
+                            Background="{DynamicResource BackgroundBrush}" 
+                            Padding="15,10"
+                            Margin="0,10,0,10">
+                        <StackPanel>
+                            <TextBlock Text="View Filters" 
+                                       FontWeight="SemiBold" 
+                                       FontSize="12" 
+                                       Margin="0,0,0,8"/>
+                            <ComboBox SelectedValue="{Binding FilterStatus, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedValuePath="Tag"
+                                      Margin="0,0,0,8">
+                                <ComboBoxItem Content="All Status" Tag="{x:Null}"/>
+                                <ComboBoxItem Content="Online" Tag="Online"/>
+                                <ComboBoxItem Content="Offline" Tag="Offline"/>
+                                <ComboBoxItem Content="Unknown" Tag="Unknown"/>
+                            </ComboBox>
+                            <ComboBox SelectedValue="{Binding FilterGroup, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedValuePath="Content"
+                                      Margin="0,0,0,8"
+                                      IsEditable="True">
+                                <ComboBoxItem Content="All Groups"/>
+                            </ComboBox>
+                            <CheckBox Content="⭐ Favorites Only" 
+                                      IsChecked="{Binding ShowFavoritesOnly, UpdateSourceTrigger=PropertyChanged}"
+                                      Margin="0,0,0,8"/>
+                        </StackPanel>
+                    </Border>
+
                     <!-- Tabbed Device Lists -->
                     <TabControl Grid.Row="2" 
                                 SelectedIndex="{Binding SelectedTabIndex}"
@@ -231,6 +347,7 @@
                         <TabItem Header="📷 Cameras">
                             <ListBox ItemsSource="{Binding CameraDevices}"
                                      SelectedItem="{Binding SelectedDevice}"
+                                     SelectionMode="Extended"
                                      BorderThickness="0">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
@@ -327,6 +444,7 @@
                         <TabItem Header="🖥️ Servers">
                             <ListBox ItemsSource="{Binding ServerDevices}"
                                      SelectedItem="{Binding SelectedDevice}"
+                                     SelectionMode="Extended"
                                      BorderThickness="0">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
@@ -422,7 +540,7 @@
                     </TabControl>
 
                     <!-- Actions -->
-                    <StackPanel Grid.Row="3" 
+                    <StackPanel Grid.Row="4" 
                                 Orientation="Horizontal" 
                                 HorizontalAlignment="Right"
                                 Margin="15,10,15,15">
@@ -430,11 +548,61 @@
                                 Command="{Binding RefreshDeviceCommand}"
                                 Margin="5,0"
                                 Padding="12,6"/>
+                        <Button Content="📊 History" 
+                                Command="{Binding ShowDeviceHistoryCommand}"
+                                Margin="5,0"
+                                Padding="12,6"
+                                ToolTip="View Device History"/>
                         <Button Content="🗑️ Remove" 
                                 Command="{Binding RemoveDeviceCommand}"
                                 Margin="5,0"
                                 Padding="12,6"/>
                     </StackPanel>
+
+                    <!-- Bulk Actions Panel -->
+                    <Border Grid.Row="4" 
+                            Background="{DynamicResource AccentBrush}"
+                            Padding="10"
+                            Margin="15,10,15,15"
+                            CornerRadius="4"
+                            Visibility="{Binding SelectedDevices.Count, Converter={StaticResource CountToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <Binding Path="SelectedDevices.Count" StringFormat="{}Selected: {0}"/>
+                                </TextBlock.Text>
+                            </TextBlock> 
+                                       Foreground="White"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"
+                                       FontWeight="SemiBold"/>
+                            <Button Content="🔄 Refresh All" 
+                                    Command="{Binding BulkRefreshCommand}"
+                                    Margin="3,0"
+                                    Padding="10,6"
+                                    Background="White"
+                                    Foreground="{DynamicResource AccentBrush}"/>
+                            <Button Content="⭐ Favorite" 
+                                    Command="{Binding BulkSetFavoriteCommand}"
+                                    CommandParameter="True"
+                                    Margin="3,0"
+                                    Padding="10,6"
+                                    Background="White"
+                                    Foreground="{DynamicResource AccentBrush}"/>
+                            <Button Content="📁 Group" 
+                                    Click="BulkGroupButton_Click"
+                                    Margin="3,0"
+                                    Padding="10,6"
+                                    Background="White"
+                                    Foreground="{DynamicResource AccentBrush}"/>
+                            <Button Content="🗑️ Delete" 
+                                    Command="{Binding BulkDeleteCommand}"
+                                    Margin="3,0"
+                                    Padding="10,6"
+                                    Background="White"
+                                    Foreground="Red"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -447,10 +615,22 @@
                     Padding="20">
                 <ScrollViewer>
                     <StackPanel>
-                        <TextBlock Text="Device Details" 
-                                   FontSize="24" 
-                                   FontWeight="Bold" 
-                                   Margin="0,0,0,20"/>
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Device Details" 
+                                       FontSize="24" 
+                                       FontWeight="Bold" 
+                                       Grid.Column="0"/>
+                            <CheckBox Content="⭐" 
+                                      IsChecked="{Binding SelectedDevice.IsFavorite, UpdateSourceTrigger=PropertyChanged}"
+                                      Grid.Column="1"
+                                      FontSize="20"
+                                      ToolTip="Mark as Favorite"
+                                      VerticalAlignment="Center"/>
+                        </Grid>
 
                         <TextBlock Text="Device Name" 
                                    FontWeight="SemiBold" 
@@ -510,11 +690,41 @@
                             <ComboBoxItem Content="Other" Tag="Other"/>
                         </ComboBox>
 
+                        <!-- Quick Actions -->
                         <Border Background="{DynamicResource BackgroundBrush}" 
                                 CornerRadius="4" 
                                 Padding="15"
                                 BorderThickness="1"
-                                BorderBrush="{DynamicResource BorderBrush}">
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                Margin="0,0,0,15">
+                            <StackPanel>
+                                <TextBlock Text="Quick Actions" 
+                                           FontWeight="Bold" 
+                                           FontSize="16" 
+                                           Margin="0,0,0,10"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="🏓 Ping" 
+                                            Command="{Binding PingDeviceCommand}"
+                                            Margin="5,0"
+                                            Padding="12,6"
+                                            Background="{DynamicResource AccentBrush}"
+                                            Foreground="White"/>
+                                    <Button Content="🔌 Port Scan" 
+                                            Command="{Binding ScanPortsCommand}"
+                                            Margin="5,0"
+                                            Padding="12,6"
+                                            Background="{DynamicResource AccentBrush}"
+                                            Foreground="White"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource BackgroundBrush}" 
+                                CornerRadius="4" 
+                                Padding="15"
+                                BorderThickness="1"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                Margin="0,0,0,15">
                             <StackPanel>
                                 <TextBlock Text="Status Information" 
                                            FontWeight="Bold" 
@@ -527,6 +737,8 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
@@ -545,17 +757,56 @@
                                                FontWeight="SemiBold" 
                                                Margin="0,0,10,10"/>
                                     <TextBlock Grid.Row="1" Grid.Column="1" 
-                                               Text="{Binding SelectedDevice.LastSeen, TargetNullValue='Never'}" 
+                                               Text="{Binding SelectedDevice.LastSeen, TargetNullValue='Never', StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" 
                                                Margin="0,0,0,10"/>
 
                                     <TextBlock Grid.Row="2" Grid.Column="0" 
+                                               Text="MAC Address:" 
+                                               FontWeight="SemiBold" 
+                                               Margin="0,0,10,10"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" 
+                                               Text="{Binding SelectedDevice.MacAddress, TargetNullValue='Not detected'}" 
+                                               Margin="0,0,0,10"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" 
                                                Text="Group:" 
                                                FontWeight="SemiBold" 
-                                               Margin="0,0,10,0"/>
-                                    <TextBox Grid.Row="2" Grid.Column="1" 
+                                               Margin="0,0,10,10"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" 
                                              Text="{Binding SelectedDevice.Group, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                                             Padding="8"/>
+                                             Padding="8"
+                                             Margin="0,0,0,10"/>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" 
+                                               Text="Tags:" 
+                                               FontWeight="SemiBold" 
+                                               Margin="0,0,10,0"/>
+                                    <TextBox Grid.Row="4" Grid.Column="1" 
+                                             Text="{Binding SelectedDevice.Tags, Converter={StaticResource TagsToStringConverter}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                             Padding="8"
+                                             ToolTip="Comma-separated tags"/>
                                 </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Notes -->
+                        <Border Background="{DynamicResource BackgroundBrush}" 
+                                CornerRadius="4" 
+                                Padding="15"
+                                BorderThickness="1"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                Margin="0,0,0,15">
+                            <StackPanel>
+                                <TextBlock Text="Notes" 
+                                           FontWeight="Bold" 
+                                           FontSize="16" 
+                                           Margin="0,0,0,10"/>
+                                <TextBox Text="{Binding SelectedDevice.Notes, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="True"
+                                         MinHeight="80"
+                                         Padding="8"
+                                         VerticalScrollBarVisibility="Auto"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>

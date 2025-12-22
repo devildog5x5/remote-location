@@ -54,10 +54,24 @@ namespace IPManagementInterface.Services
             var isOnline = await _communicationService.CheckDeviceStatusAsync(
                 device.IpAddress, device.Port, device.Protocol);
             
+            var wasOnline = device.Status == DeviceStatus.Online;
             device.Status = isOnline ? DeviceStatus.Online : DeviceStatus.Offline;
+            
             if (isOnline)
             {
                 device.LastSeen = DateTime.Now;
+                device.LastOnlineTime = DateTime.Now;
+                
+                // Update uptime tracking
+                if (wasOnline)
+                {
+                    device.TotalUptime = device.TotalUptime.Add(DateTime.Now - (device.LastOnlineTime ?? DateTime.Now));
+                }
+            }
+            else if (wasOnline)
+            {
+                // Device went offline
+                device.LastOnlineTime = DateTime.Now;
             }
         }
 

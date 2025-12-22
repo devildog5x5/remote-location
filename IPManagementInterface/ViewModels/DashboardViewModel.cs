@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
@@ -9,6 +10,7 @@ using CommunityToolkit.Mvvm.Input;
 using IPManagementInterface.Models;
 using IPManagementInterface.Services;
 using IPManagementInterface.ViewModels;
+using IPManagementInterface.Views;
 
 namespace IPManagementInterface.ViewModels
 {
@@ -17,6 +19,14 @@ namespace IPManagementInterface.ViewModels
         private readonly DeviceManagerService _deviceManager;
         private readonly DeviceDiscoveryService _discoveryService;
         private readonly ThemeManager _themeManager;
+        private readonly BulkOperationsService _bulkOperations;
+        private readonly DeviceHistoryService _historyService;
+        private readonly ScheduledMonitoringService _monitoringService;
+        private readonly ExportImportService _exportImport;
+        private readonly DeviceTemplateService _templateService;
+        private readonly NetworkToolsService _networkTools;
+        private readonly ReportingService _reportingService;
+        private readonly SecurityService _securityService;
 
         [ObservableProperty]
         private ObservableCollection<IoTDevice> allDevices;
@@ -32,6 +42,9 @@ namespace IPManagementInterface.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<IoTDevice> otherDevices;
+
+        [ObservableProperty]
+        private ObservableCollection<IoTDevice> selectedDevices = new();
 
         [ObservableProperty]
         private IoTDevice? selectedDevice;
@@ -54,12 +67,41 @@ namespace IPManagementInterface.ViewModels
         [ObservableProperty]
         private ThemeType currentTheme;
 
+        [ObservableProperty]
+        private string searchText = string.Empty;
+
+        [ObservableProperty]
+        private string? filterGroup;
+
+        [ObservableProperty]
+        private DeviceStatus? filterStatus;
+
+        [ObservableProperty]
+        private bool showFavoritesOnly;
+
+        [ObservableProperty]
+        private string? selectedTag;
+
+        [ObservableProperty]
+        private bool isMonitoring;
+
+        [ObservableProperty]
+        private int monitoringIntervalMinutes = 5;
+
         public DashboardViewModel()
         {
             var communicationService = new DeviceCommunicationService();
             _deviceManager = new DeviceManagerService(communicationService);
-            _discoveryService = new DeviceDiscoveryService(communicationService);
+            _networkTools = new NetworkToolsService();
+            _discoveryService = new DeviceDiscoveryService(communicationService, _networkTools);
             _themeManager = new ThemeManager();
+            _historyService = new DeviceHistoryService();
+            _bulkOperations = new BulkOperationsService(_deviceManager);
+            _monitoringService = new ScheduledMonitoringService(_deviceManager, _historyService);
+            _exportImport = new ExportImportService();
+            _templateService = new DeviceTemplateService();
+            _reportingService = new ReportingService();
+            _securityService = new SecurityService();
 
             AllDevices = new ObservableCollection<IoTDevice>();
             CameraDevices = new ObservableCollection<IoTDevice>();
@@ -73,6 +115,19 @@ namespace IPManagementInterface.ViewModels
             // Initialize theme
             CurrentTheme = _themeManager.GetSavedTheme();
             _themeManager.ApplyTheme(CurrentTheme);
+
+            // Subscribe to property changes for filtering
+            PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(SearchText) || 
+                    e.PropertyName == nameof(FilterGroup) || 
+                    e.PropertyName == nameof(FilterStatus) ||
+                    e.PropertyName == nameof(ShowFavoritesOnly) ||
+                    e.PropertyName == nameof(SelectedTag))
+                {
+                    ApplyFilters();
+                }
+            };
         }
 
         private void LoadDevices()
@@ -150,7 +205,9 @@ namespace IPManagementInterface.ViewModels
                         d => d.IpAddress == device.IpAddress && d.Port == device.Port);
                     if (existing == null)
                     {
+                        device.FirstSeen = DateTime.Now;
                         _deviceManager.AddDevice(device);
+                        _historyService.AddDeviceDiscovered(device.IpAddress, device.DeviceType);
                         addedCount++;
                     }
                 }
@@ -177,10 +234,12 @@ namespace IPManagementInterface.ViewModels
                 IpAddress = "192.168.1.1",
                 Port = 80,
                 Protocol = "http",
-                DeviceType = DeviceType.Other
+                DeviceType = DeviceType.Other,
+                FirstSeen = DateTime.Now
             };
 
             _deviceManager.AddDevice(newDevice);
+            _historyService.AddDeviceDiscovered(newDevice.IpAddress, newDevice.DeviceType);
             LoadDevices();
             SelectedDevice = newDevice;
             
@@ -224,7 +283,14 @@ namespace IPManagementInterface.ViewModels
         {
             if (SelectedDevice != null)
             {
+                var oldStatus = SelectedDevice.Status;
                 await _deviceManager.RefreshDeviceStatusAsync(SelectedDevice);
+                
+                if (oldStatus != SelectedDevice.Status)
+                {
+                    _historyService.AddStatusChange(SelectedDevice.IpAddress, oldStatus, SelectedDevice.Status);
+                }
+                
                 _deviceManager.UpdateDevice(SelectedDevice);
             }
         }
@@ -247,6 +313,239 @@ namespace IPManagementInterface.ViewModels
                 
                 // Force property notification
                 OnPropertyChanged(nameof(CurrentTheme));
+            }
+        }
+
+        private void ApplyFilters()
+        {
+            LoadDevices();
+            
+            // Update filter group dropdown
+            var groups = _deviceManager.Devices
+                .Where(d => !string.IsNullOrEmpty(d.Group))
+                .Select(d => d.Group!)
+                .Distinct()
+                .OrderBy(g => g)
+                .ToList();
+        }
+
+        private IEnumerable<IoTDevice> GetFilteredDevices(IEnumerable<IoTDevice> devices)
+        {
+            var filtered = devices.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchText))
+            {
+                var searchLower = SearchText.ToLowerInvariant();
+                filtered = filtered.Where(d => 
+                    d.Name.ToLowerInvariant().Contains(searchLower) ||
+                    d.IpAddress.Contains(SearchText) ||
+                    (d.Group?.ToLowerInvariant().Contains(searchLower) ?? false) ||
+                    d.Tags.Any(t => t.ToLowerInvariant().Contains(searchLower)));
+            }
+
+            if (!string.IsNullOrEmpty(FilterGroup))
+            {
+                filtered = filtered.Where(d => d.Group == FilterGroup);
+            }
+
+            if (FilterStatus.HasValue)
+            {
+                filtered = filtered.Where(d => d.Status == FilterStatus.Value);
+            }
+
+            if (ShowFavoritesOnly)
+            {
+                filtered = filtered.Where(d => d.IsFavorite);
+            }
+
+            if (!string.IsNullOrEmpty(SelectedTag))
+            {
+                filtered = filtered.Where(d => d.Tags.Contains(SelectedTag));
+            }
+
+            return filtered;
+        }
+
+        [RelayCommand]
+        private async Task BulkRefresh()
+        {
+            if (SelectedDevices.Count > 0)
+            {
+                foreach (var device in SelectedDevices)
+                {
+                    var oldStatus = device.Status;
+                    await _deviceManager.RefreshDeviceStatusAsync(device);
+                    if (oldStatus != device.Status)
+                    {
+                        _historyService.AddStatusChange(device.IpAddress, oldStatus, device.Status);
+                    }
+                }
+                LoadDevices();
+            }
+        }
+
+        [RelayCommand]
+        private void BulkAssignGroup(string? group)
+        {
+            if (SelectedDevices.Count > 0 && !string.IsNullOrEmpty(group))
+            {
+                _bulkOperations.BulkAssignGroup(SelectedDevices, group);
+                LoadDevices();
+            }
+        }
+
+        [RelayCommand]
+        private void BulkDelete()
+        {
+            if (SelectedDevices.Count > 0)
+            {
+                _bulkOperations.BulkDelete(SelectedDevices);
+                SelectedDevices.Clear();
+                LoadDevices();
+            }
+        }
+
+        [RelayCommand]
+        private void BulkSetFavorite(object? parameter)
+        {
+            if (SelectedDevices.Count > 0 && parameter is bool isFavorite)
+            {
+                _bulkOperations.BulkSetFavorite(SelectedDevices, isFavorite);
+                LoadDevices();
+            }
+        }
+
+        [RelayCommand]
+        private void ExportDevices(string format)
+        {
+            var devices = GetFilteredDevices(_deviceManager.Devices).ToList();
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = format.ToLower() switch
+                {
+                    "csv" => "CSV files (*.csv)|*.csv",
+                    "json" => "JSON files (*.json)|*.json",
+                    "xml" => "XML files (*.xml)|*.xml",
+                    _ => "All files (*.*)|*.*"
+                }
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                switch (format.ToLower())
+                {
+                    case "csv":
+                        _exportImport.ExportToCsv(devices, dialog.FileName);
+                        break;
+                    case "json":
+                        _exportImport.ExportToJson(devices, dialog.FileName);
+                        break;
+                    case "xml":
+                        _exportImport.ExportToXml(devices, dialog.FileName);
+                        break;
+                }
+            }
+        }
+
+        [RelayCommand]
+        private void ImportDevices(string format)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = format.ToLower() switch
+                {
+                    "csv" => "CSV files (*.csv)|*.csv",
+                    "json" => "JSON files (*.json)|*.json",
+                    _ => "All files (*.*)|*.*"
+                }
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                List<IoTDevice> devices;
+                switch (format.ToLower())
+                {
+                    case "csv":
+                        devices = _exportImport.ImportFromCsv(dialog.FileName);
+                        break;
+                    case "json":
+                        devices = _exportImport.ImportFromJson(dialog.FileName);
+                        break;
+                    default:
+                        return;
+                }
+
+                foreach (var device in devices)
+                {
+                    _deviceManager.AddDevice(device);
+                }
+
+                LoadDevices();
+            }
+        }
+
+        [RelayCommand]
+        private async Task PingDevice()
+        {
+            if (SelectedDevice != null)
+            {
+                var result = await _networkTools.PingAsync(SelectedDevice.IpAddress);
+                DiscoveryStatus = result.Success 
+                    ? $"Ping successful - {result.RoundTripTime}ms" 
+                    : "Ping failed";
+            }
+        }
+
+        [RelayCommand]
+        private async Task ScanPorts()
+        {
+            if (SelectedDevice != null)
+            {
+                var commonPorts = new[] { 80, 443, 8080, 8443, 22, 23, 21, 25, 53, 3389 };
+                var results = await _networkTools.ScanPortsAsync(SelectedDevice.IpAddress, commonPorts);
+                var openPorts = results.Where(r => r.IsOpen).Select(r => r.Port).ToList();
+                DiscoveryStatus = openPorts.Any() 
+                    ? $"Open ports: {string.Join(", ", openPorts)}" 
+                    : "No open ports found";
+            }
+        }
+
+        [RelayCommand]
+        private void ToggleMonitoring()
+        {
+            if (IsMonitoring)
+            {
+                _monitoringService.StopMonitoring();
+                IsMonitoring = false;
+            }
+            else
+            {
+                _monitoringService.StartMonitoring(MonitoringIntervalMinutes);
+                IsMonitoring = true;
+            }
+        }
+
+        [RelayCommand]
+        private void ShowDeviceHistory()
+        {
+            // Will be implemented in UI
+        }
+
+        [RelayCommand]
+        private void ShowStatistics()
+        {
+            // Will be implemented in UI
+        }
+
+        [RelayCommand]
+        private void AddDeviceFromTemplate(DeviceTemplate? template)
+        {
+            if (template != null)
+            {
+                var device = _templateService.CreateDeviceFromTemplate(template, "192.168.1.1", $"New {template.Name}");
+                _deviceManager.AddDevice(device);
+                LoadDevices();
+                SelectedDevice = device;
             }
         }
     }

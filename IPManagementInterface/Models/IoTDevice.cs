@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace IPManagementInterface.Models
@@ -34,6 +35,14 @@ namespace IPManagementInterface.Models
         private string? _model;
         private string? _firmwareVersion;
         private string? _group;
+        private bool _isFavorite;
+        private string? _notes;
+        private string? _macAddress;
+        private DateTime _firstSeen = DateTime.Now;
+        private TimeSpan _totalUptime = TimeSpan.Zero;
+        private DateTime? _lastOnlineTime;
+        private Dictionary<string, string> _customProperties = new();
+        private List<string> _tags = new();
 
         public string Name
         {
@@ -99,6 +108,54 @@ namespace IPManagementInterface.Models
         {
             get => _group;
             set { _group = value; OnPropertyChanged(); }
+        }
+
+        public bool IsFavorite
+        {
+            get => _isFavorite;
+            set { _isFavorite = value; OnPropertyChanged(); }
+        }
+
+        public string? Notes
+        {
+            get => _notes;
+            set { _notes = value; OnPropertyChanged(); }
+        }
+
+        public string? MacAddress
+        {
+            get => _macAddress;
+            set { _macAddress = value; OnPropertyChanged(); }
+        }
+
+        public DateTime FirstSeen
+        {
+            get => _firstSeen;
+            set { _firstSeen = value; OnPropertyChanged(); }
+        }
+
+        public TimeSpan TotalUptime
+        {
+            get => _totalUptime;
+            set { _totalUptime = value; OnPropertyChanged(); }
+        }
+
+        public DateTime? LastOnlineTime
+        {
+            get => _lastOnlineTime;
+            set { _lastOnlineTime = value; OnPropertyChanged(); }
+        }
+
+        public Dictionary<string, string> CustomProperties
+        {
+            get => _customProperties;
+            set { _customProperties = value ?? new Dictionary<string, string>(); OnPropertyChanged(); }
+        }
+
+        public List<string> Tags
+        {
+            get => _tags;
+            set { _tags = value ?? new List<string>(); OnPropertyChanged(); }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

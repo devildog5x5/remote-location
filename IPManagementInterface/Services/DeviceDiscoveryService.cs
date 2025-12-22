@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using IPManagementInterface.Models;
@@ -12,10 +13,12 @@ namespace IPManagementInterface.Services
     public class DeviceDiscoveryService
     {
         private readonly DeviceCommunicationService _communicationService;
+        private readonly NetworkToolsService? _networkTools;
 
-        public DeviceDiscoveryService(DeviceCommunicationService communicationService)
+        public DeviceDiscoveryService(DeviceCommunicationService communicationService, NetworkToolsService? networkTools = null)
         {
             _communicationService = communicationService;
+            _networkTools = networkTools;
         }
 
         public async Task<List<IoTDevice>> DiscoverDevicesAsync(
@@ -23,6 +26,7 @@ namespace IPManagementInterface.Services
             string? group = null,
             int startHost = 1,
             int endHost = 254,
+            IEnumerable<int>? customPorts = null,
             CancellationToken cancellationToken = default)
         {
             var discoveredDevices = new List<IoTDevice>();
@@ -33,8 +37,8 @@ namespace IPManagementInterface.Services
             if (string.IsNullOrEmpty(baseIp))
                 return discoveredDevices;
 
-            // Common ports to check
-            var ports = new[] { 80, 443, 8000, 8080, 8443 };
+            // Use custom ports or default ports
+            var ports = customPorts?.ToList() ?? new List<int> { 80, 443, 8000, 8080, 8443 };
             var protocols = new[] { "http", "https" };
 
             for (int host = startHost; host <= endHost; host++)
@@ -59,6 +63,12 @@ namespace IPManagementInterface.Services
                                 var device = await TryDiscoverDeviceAsync(localIp, localPort, localProtocol, deviceType, group, cancellationToken);
                                 if (device != null)
                                 {
+                                    // Try to get MAC address
+                                    if (_networkTools != null)
+                                    {
+                                        device.MacAddress = _networkTools.GetMacAddress(localIp);
+                                    }
+
                                     lock (discoveredDevices)
                                     {
                                         discoveredDevices.Add(device);
@@ -119,43 +129,98 @@ namespace IPManagementInterface.Services
         {
             response = response.ToLowerInvariant();
 
-            if (response.Contains("camera") || response.Contains("ipcam") || response.Contains("webcam"))
+            // Enhanced device fingerprinting
+            var fingerprint = FingerprintDevice(response);
+
+            device.DeviceType = fingerprint.DeviceType;
+            device.Name = fingerprint.Name ?? $"Device {device.IpAddress}";
+            device.Manufacturer = fingerprint.Manufacturer;
+            device.Model = fingerprint.Model;
+            device.FirmwareVersion = fingerprint.FirmwareVersion;
+
+            return device;
+        }
+
+        private DeviceFingerprint FingerprintDevice(string response)
+        {
+            var fingerprint = new DeviceFingerprint();
+
+            // Camera detection
+            if (response.Contains("camera") || response.Contains("ipcam") || response.Contains("webcam") || 
+                response.Contains("axis") || response.Contains("hikvision") || response.Contains("dahua"))
             {
-                device.DeviceType = DeviceType.Camera;
-                device.Name = $"Camera {device.IpAddress}";
+                fingerprint.DeviceType = DeviceType.Camera;
+                fingerprint.Name = "IP Camera";
+                if (response.Contains("axis")) fingerprint.Manufacturer = "Axis";
+                else if (response.Contains("hikvision")) fingerprint.Manufacturer = "Hikvision";
+                else if (response.Contains("dahua")) fingerprint.Manufacturer = "Dahua";
             }
-            else if (response.Contains("router") || response.Contains("gateway"))
+            // Router detection
+            else if (response.Contains("router") || response.Contains("gateway") || 
+                     response.Contains("cisco") || response.Contains("netgear") || response.Contains("tp-link"))
             {
-                device.DeviceType = DeviceType.Router;
-                device.Name = $"Router {device.IpAddress}";
+                fingerprint.DeviceType = DeviceType.Router;
+                fingerprint.Name = "Router";
+                if (response.Contains("cisco")) fingerprint.Manufacturer = "Cisco";
+                else if (response.Contains("netgear")) fingerprint.Manufacturer = "Netgear";
+                else if (response.Contains("tp-link")) fingerprint.Manufacturer = "TP-Link";
             }
-            else if (response.Contains("switch"))
+            // Switch detection
+            else if (response.Contains("switch") || response.Contains("switching"))
             {
-                device.DeviceType = DeviceType.Switch;
-                device.Name = $"Switch {device.IpAddress}";
+                fingerprint.DeviceType = DeviceType.Switch;
+                fingerprint.Name = "Network Switch";
             }
-            else if (response.Contains("access point") || response.Contains("ap"))
+            // Access Point detection
+            else if (response.Contains("access point") || response.Contains("ap") || response.Contains("wireless"))
             {
-                device.DeviceType = DeviceType.AccessPoint;
-                device.Name = $"Access Point {device.IpAddress}";
+                fingerprint.DeviceType = DeviceType.AccessPoint;
+                fingerprint.Name = "Access Point";
             }
-            else if (response.Contains("server"))
+            // Server detection
+            else if (response.Contains("server") || response.Contains("apache") || response.Contains("nginx") || 
+                     response.Contains("iis") || response.Contains("tomcat"))
             {
-                device.DeviceType = DeviceType.Server;
-                device.Name = $"Server {device.IpAddress}";
+                fingerprint.DeviceType = DeviceType.Server;
+                fingerprint.Name = "Server";
+                if (response.Contains("apache")) fingerprint.Model = "Apache";
+                else if (response.Contains("nginx")) fingerprint.Model = "Nginx";
+                else if (response.Contains("iis")) fingerprint.Model = "IIS";
             }
-            else if (response.Contains("printer"))
+            // Printer detection
+            else if (response.Contains("printer") || response.Contains("hp") || response.Contains("canon") || 
+                     response.Contains("epson") || response.Contains("brother"))
             {
-                device.DeviceType = DeviceType.Printer;
-                device.Name = $"Printer {device.IpAddress}";
+                fingerprint.DeviceType = DeviceType.Printer;
+                fingerprint.Name = "Printer";
+                if (response.Contains("hp")) fingerprint.Manufacturer = "HP";
+                else if (response.Contains("canon")) fingerprint.Manufacturer = "Canon";
+                else if (response.Contains("epson")) fingerprint.Manufacturer = "Epson";
+                else if (response.Contains("brother")) fingerprint.Manufacturer = "Brother";
             }
             else
             {
-                device.DeviceType = DeviceType.Other;
-                device.Name = $"Device {device.IpAddress}";
+                fingerprint.DeviceType = DeviceType.Other;
+                fingerprint.Name = "Unknown Device";
             }
 
-            return device;
+            // Try to extract firmware version
+            var firmwareMatch = Regex.Match(response, @"(?:firmware|version|v|ver)[\s:]*([\d.]+)", RegexOptions.IgnoreCase);
+            if (firmwareMatch.Success)
+            {
+                fingerprint.FirmwareVersion = firmwareMatch.Groups[1].Value;
+            }
+
+            return fingerprint;
+        }
+
+        private class DeviceFingerprint
+        {
+            public DeviceType DeviceType { get; set; }
+            public string? Name { get; set; }
+            public string? Manufacturer { get; set; }
+            public string? Model { get; set; }
+            public string? FirmwareVersion { get; set; }
         }
 
         private string GetLocalNetworkBase()

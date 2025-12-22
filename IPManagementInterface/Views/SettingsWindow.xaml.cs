@@ -26,6 +26,9 @@ namespace IPManagementInterface.Views
                     SetSelectedTheme(_mainViewModel.CurrentTheme);
                 }
             };
+
+            // Bind monitoring settings
+            DataContext = _mainViewModel;
         }
 
         private void SetSelectedTheme(ViewModels.ThemeType theme)
