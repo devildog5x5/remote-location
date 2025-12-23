@@ -1,4 +1,6 @@
 using System.Globalization;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
 
 namespace IPManagementInterface.Shared.Converters;
 

@@ -12,17 +12,40 @@ public partial class SettingsPage : ContentPage
         _themeManager = themeManager;
     }
 
+    private void ApplyTheme(ThemeType theme, string themeName)
+    {
+        _themeManager.SaveTheme(theme);
+        _themeManager.ApplyTheme(theme);
+        DisplayAlert("Theme Changed", $"{themeName} theme applied", "OK");
+    }
+
     private void LightTheme_Clicked(object sender, EventArgs e)
     {
-        _themeManager.SaveTheme(ThemeManager.ThemeType.Light);
-        _themeManager.ApplyTheme(ThemeManager.ThemeType.Light);
-        DisplayAlert("Theme Changed", "Light theme applied", "OK");
+        ApplyTheme(ThemeType.Light, "Light");
     }
 
     private void DarkTheme_Clicked(object sender, EventArgs e)
     {
-        _themeManager.SaveTheme(ThemeManager.ThemeType.Dark);
-        _themeManager.ApplyTheme(ThemeManager.ThemeType.Dark);
-        DisplayAlert("Theme Changed", "Dark theme applied", "OK");
+        ApplyTheme(ThemeType.Dark, "Dark");
+    }
+
+    private void USMCTheme_Clicked(object sender, EventArgs e)
+    {
+        ApplyTheme(ThemeType.USMC, "USMC");
+    }
+
+    private void OliveDrabTheme_Clicked(object sender, EventArgs e)
+    {
+        ApplyTheme(ThemeType.OliveDrab, "Olive Drab");
+    }
+
+    private void OceanTheme_Clicked(object sender, EventArgs e)
+    {
+        ApplyTheme(ThemeType.Ocean, "Ocean");
+    }
+
+    private void SunsetTheme_Clicked(object sender, EventArgs e)
+    {
+        ApplyTheme(ThemeType.Sunset, "Sunset");
     }
 }

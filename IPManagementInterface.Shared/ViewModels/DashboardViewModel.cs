@@ -18,6 +18,18 @@ public partial class DashboardViewModel : ObservableObject
     private ObservableCollection<IoTDevice> allDevices = new();
 
     [ObservableProperty]
+    private ObservableCollection<IoTDevice> cameraDevices = new();
+
+    [ObservableProperty]
+    private ObservableCollection<IoTDevice> networkDevices = new();
+
+    [ObservableProperty]
+    private ObservableCollection<IoTDevice> serverDevices = new();
+
+    [ObservableProperty]
+    private ObservableCollection<IoTDevice> otherDevices = new();
+
+    [ObservableProperty]
     private ObservableCollection<IoTDevice> filteredDevices = new();
 
     [ObservableProperty]
@@ -28,6 +40,9 @@ public partial class DashboardViewModel : ObservableObject
 
     [ObservableProperty]
     private bool isRefreshing;
+
+    [ObservableProperty]
+    private int selectedCategoryIndex = 0; // 0=All, 1=Cameras, 2=Network, 3=Servers, 4=Other
 
     public DashboardViewModel(
         DeviceManagerService deviceManager,
@@ -41,16 +56,58 @@ public partial class DashboardViewModel : ObservableObject
     private void LoadDevices()
     {
         AllDevices.Clear();
+        CameraDevices.Clear();
+        NetworkDevices.Clear();
+        ServerDevices.Clear();
+        OtherDevices.Clear();
+
         foreach (var device in _deviceManager.Devices)
         {
             AllDevices.Add(device);
+            CategorizeDevice(device);
         }
+        
         ApplyFilters();
+    }
+
+    private void CategorizeDevice(IoTDevice device)
+    {
+        switch (device.DeviceType)
+        {
+            case DeviceType.Camera:
+                if (!CameraDevices.Contains(device))
+                    CameraDevices.Add(device);
+                break;
+            case DeviceType.Router:
+            case DeviceType.Switch:
+            case DeviceType.AccessPoint:
+                if (!NetworkDevices.Contains(device))
+                    NetworkDevices.Add(device);
+                break;
+            case DeviceType.Server:
+            case DeviceType.Printer:
+                if (!ServerDevices.Contains(device))
+                    ServerDevices.Add(device);
+                break;
+            default:
+                if (!OtherDevices.Contains(device))
+                    OtherDevices.Add(device);
+                break;
+        }
     }
 
     private void ApplyFilters()
     {
-        var filtered = AllDevices.AsEnumerable();
+        ObservableCollection<IoTDevice> sourceCollection = SelectedCategoryIndex switch
+        {
+            1 => CameraDevices,
+            2 => NetworkDevices,
+            3 => ServerDevices,
+            4 => OtherDevices,
+            _ => AllDevices
+        };
+
+        var filtered = sourceCollection.AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(SearchText))
         {
@@ -69,6 +126,11 @@ public partial class DashboardViewModel : ObservableObject
     }
 
     partial void OnSearchTextChanged(string value)
+    {
+        ApplyFilters();
+    }
+
+    partial void OnSelectedCategoryIndexChanged(int value)
     {
         ApplyFilters();
     }
@@ -99,12 +161,22 @@ public partial class DashboardViewModel : ObservableObject
             IpAddress = "192.168.1.1",
             Port = 80,
             Protocol = "http",
-            DeviceType = Models.DeviceType.Other,
-            FirstSeen = System.DateTime.Now
+            DeviceType = DeviceType.Other,
+            FirstSeen = DateTime.Now
         };
 
         _deviceManager.AddDevice(newDevice);
         LoadDevices();
         SelectedDevice = newDevice;
+    }
+
+    [RelayCommand]
+    private void RemoveDevice(IoTDevice device)
+    {
+        if (device != null)
+        {
+            _deviceManager.RemoveDevice(device);
+            LoadDevices();
+        }
     }
 }

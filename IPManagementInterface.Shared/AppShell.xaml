@@ -27,4 +27,14 @@
         ContentTemplate="{DataTemplate local:DeviceDetailsPage}"
         Route="DeviceDetailsPage" />
 
+    <ShellContent
+        Title="Statistics"
+        ContentTemplate="{DataTemplate local:StatisticsPage}"
+        Route="StatisticsPage" />
+
+    <ShellContent
+        Title="History"
+        ContentTemplate="{DataTemplate local:HistoryPage}"
+        Route="HistoryPage" />
+
 </Shell>

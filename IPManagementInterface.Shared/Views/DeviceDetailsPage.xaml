@@ -2,61 +2,215 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:IPManagementInterface.Shared.Models"
+             xmlns:converters="clr-namespace:IPManagementInterface.Shared.Converters"
              x:Class="IPManagementInterface.Shared.Views.DeviceDetailsPage"
              Title="Device Details"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StatusToColorConverter x:Key="StatusToColorConverter" />
+            <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <ScrollView>
         <StackLayout Padding="20" Spacing="15">
             
+            <!-- Status Header -->
             <Frame BackgroundColor="{DynamicResource SurfaceColor}" 
                    CornerRadius="10" 
-                   Padding="15">
+                   Padding="15"
+                   HasShadow="True">
                 <StackLayout Spacing="10">
-                    <Label Text="{Binding Device.Name}" 
-                           FontSize="24" 
-                           FontAttributes="Bold"
-                           TextColor="{DynamicResource PrimaryTextColor}"/>
-                    <Label Text="{Binding Device.IpAddress}" 
-                           FontSize="18"
-                           TextColor="{DynamicResource SecondaryTextColor}"/>
-                    <Label Text="{Binding Device.Status}" 
-                           FontSize="16"
-                           TextColor="{Binding Device.Status, Converter={StaticResource StatusToColorConverter}}"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackLayout Grid.Column="0" Spacing="5">
+                            <Label Text="{Binding Device.Name}" 
+                                   FontSize="24" 
+                                   FontAttributes="Bold"
+                                   TextColor="{DynamicResource PrimaryTextColor}"/>
+                            <Label Text="{Binding Device.IpAddress}" 
+                                   FontSize="18"
+                                   TextColor="{DynamicResource SecondaryTextColor}"/>
+                        </StackLayout>
+                        <Frame Grid.Column="1"
+                               BackgroundColor="{Binding Device.Status, Converter={StaticResource StatusToColorConverter}}"
+                               CornerRadius="8"
+                               Padding="10,5"
+                               HasShadow="False">
+                            <Label Text="{Binding Device.Status}" 
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="White"/>
+                        </Frame>
+                    </Grid>
                 </StackLayout>
             </Frame>
 
+            <!-- Basic Information -->
             <Frame BackgroundColor="{DynamicResource SurfaceColor}" 
                    CornerRadius="10" 
-                   Padding="15">
-                <StackLayout Spacing="10">
-                    <Label Text="Device Information" 
+                   Padding="15"
+                   HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="Basic Information" 
                            FontSize="18" 
                            FontAttributes="Bold"
                            TextColor="{DynamicResource PrimaryTextColor}"/>
                     
-                    <Label Text="Port" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
-                    <Label Text="{Binding Device.Port}" FontSize="16" TextColor="{DynamicResource PrimaryTextColor}"/>
+                    <StackLayout Spacing="5">
+                        <Label Text="Name" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                        <Entry Text="{Binding Device.Name}" 
+                               Placeholder="Device name"
+                               BackgroundColor="{DynamicResource PageBackgroundColor}"
+                               TextColor="{DynamicResource PrimaryTextColor}"/>
+                    </StackLayout>
                     
-                    <Label Text="Protocol" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
-                    <Label Text="{Binding Device.Protocol}" FontSize="16" TextColor="{DynamicResource PrimaryTextColor}"/>
+                    <StackLayout Spacing="5">
+                        <Label Text="IP Address" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                        <Entry Text="{Binding Device.IpAddress}" 
+                               Placeholder="192.168.1.1"
+                               Keyboard="Default"
+                               BackgroundColor="{DynamicResource PageBackgroundColor}"
+                               TextColor="{DynamicResource PrimaryTextColor}"/>
+                    </StackLayout>
                     
-                    <Label Text="Device Type" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
-                    <Label Text="{Binding Device.DeviceType}" FontSize="16" TextColor="{DynamicResource PrimaryTextColor}"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <StackLayout Grid.Column="0" Spacing="5">
+                            <Label Text="Port" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                            <Entry Text="{Binding Device.Port, Mode=TwoWay}" 
+                                   Placeholder="80"
+                                   Keyboard="Numeric"
+                                   BackgroundColor="{DynamicResource PageBackgroundColor}"
+                                   TextColor="{DynamicResource PrimaryTextColor}"/>
+                        </StackLayout>
+                        <StackLayout Grid.Column="1" Spacing="5">
+                            <Label Text="Protocol" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                            <Picker SelectedItem="{Binding Device.Protocol}"
+                                    BackgroundColor="{DynamicResource PageBackgroundColor}"
+                                    TextColor="{DynamicResource PrimaryTextColor}">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>http</x:String>
+                                        <x:String>https</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+                        </StackLayout>
+                    </Grid>
+                    
+                    <StackLayout Spacing="5">
+                        <Label Text="Device Type" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                        <Picker SelectedItem="{Binding Device.DeviceType}"
+                                BackgroundColor="{DynamicResource PageBackgroundColor}"
+                                TextColor="{DynamicResource PrimaryTextColor}">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type models:DeviceType}">
+                                    <x:Object>{x:Static models:DeviceType.Camera}</x:Object>
+                                    <x:Object>{x:Static models:DeviceType.Router}</x:Object>
+                                    <x:Object>{x:Static models:DeviceType.Switch}</x:Object>
+                                    <x:Object>{x:Static models:DeviceType.AccessPoint}</x:Object>
+                                    <x:Object>{x:Static models:DeviceType.Server}</x:Object>
+                                    <x:Object>{x:Static models:DeviceType.Printer}</x:Object>
+                                    <x:Object>{x:Static models:DeviceType.Other}</x:Object>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </StackLayout>
                 </StackLayout>
             </Frame>
 
-            <Button Text="🔄 Refresh Status" 
-                    BackgroundColor="{DynamicResource PrimaryColor}"
+            <!-- Additional Information -->
+            <Frame BackgroundColor="{DynamicResource SurfaceColor}" 
+                   CornerRadius="10" 
+                   Padding="15"
+                   HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="Additional Information" 
+                           FontSize="18" 
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}"/>
+                    
+                    <StackLayout Spacing="5">
+                        <Label Text="Group" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                        <Entry Text="{Binding Device.Group}" 
+                               Placeholder="Optional group name"
+                               BackgroundColor="{DynamicResource PageBackgroundColor}"
+                               TextColor="{DynamicResource PrimaryTextColor}"/>
+                    </StackLayout>
+                    
+                    <StackLayout Spacing="5">
+                        <Label Text="Manufacturer" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                        <Entry Text="{Binding Device.Manufacturer}" 
+                               Placeholder="Manufacturer"
+                               BackgroundColor="{DynamicResource PageBackgroundColor}"
+                               TextColor="{DynamicResource PrimaryTextColor}"/>
+                    </StackLayout>
+                    
+                    <StackLayout Spacing="5">
+                        <Label Text="Model" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                        <Entry Text="{Binding Device.Model}" 
+                               Placeholder="Model"
+                               BackgroundColor="{DynamicResource PageBackgroundColor}"
+                               TextColor="{DynamicResource PrimaryTextColor}"/>
+                    </StackLayout>
+                    
+                    <StackLayout Spacing="5">
+                        <Label Text="Notes" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                        <Editor Text="{Binding Device.Notes}" 
+                                Placeholder="Additional notes"
+                                HeightRequest="100"
+                                BackgroundColor="{DynamicResource PageBackgroundColor}"
+                                TextColor="{DynamicResource PrimaryTextColor}"/>
+                    </StackLayout>
+                    
+                    <CheckBox IsChecked="{Binding Device.IsFavorite}"
+                              Color="{DynamicResource PrimaryColor}">
+                        <CheckBox.Content>
+                            <Label Text="⭐ Favorite"
+                                   FontSize="16"
+                                   TextColor="{DynamicResource PrimaryTextColor}"
+                                   VerticalOptions="Center"
+                                   Margin="10,0,0,0"/>
+                        </CheckBox.Content>
+                    </CheckBox>
+                </StackLayout>
+            </Frame>
+
+            <!-- Actions -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Button Grid.Column="0"
+                        Text="🔄 Refresh"
+                        BackgroundColor="{DynamicResource PrimaryColor}"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HeightRequest="50"
+                        IsEnabled="{Binding Device, Converter={StaticResource IsNotNullConverter}}"
+                        Clicked="RefreshButton_Clicked"/>
+                <Button Grid.Column="1"
+                        Text="🏓 Ping"
+                        BackgroundColor="{DynamicResource AccentColor}"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HeightRequest="50"
+                        IsEnabled="{Binding Device, Converter={StaticResource IsNotNullConverter}}"
+                        Clicked="PingButton_Clicked"/>
+            </Grid>
+
+            <Button Text="💾 Save Changes"
+                    BackgroundColor="{DynamicResource SuccessColor}"
                     TextColor="White"
+                    CornerRadius="8"
+                    HeightRequest="50"
                     IsEnabled="{Binding Device, Converter={StaticResource IsNotNullConverter}}"
-                    Clicked="RefreshButton_Clicked"/>
-            
-            <Button Text="🏓 Ping Device" 
-                    BackgroundColor="{DynamicResource AccentColor}"
+                    Clicked="SaveButton_Clicked"/>
+
+            <Button Text="🗑️ Delete Device"
+                    BackgroundColor="{DynamicResource ErrorColor}"
                     TextColor="White"
+                    CornerRadius="8"
+                    HeightRequest="50"
                     IsEnabled="{Binding Device, Converter={StaticResource IsNotNullConverter}}"
-                    Clicked="PingButton_Clicked"/>
+                    Clicked="DeleteButton_Clicked"/>
 
         </StackLayout>
     </ScrollView>

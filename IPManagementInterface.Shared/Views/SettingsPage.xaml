@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:services="clr-namespace:IPManagementInterface.Shared.Services"
              x:Class="IPManagementInterface.Shared.Views.SettingsPage"
              Title="Settings"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
@@ -10,33 +11,86 @@
             
             <Frame BackgroundColor="{DynamicResource SurfaceColor}" 
                    CornerRadius="10" 
-                   Padding="15">
-                <StackLayout Spacing="10">
-                    <Label Text="Theme" 
+                   Padding="15"
+                   HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="Theme Selection" 
                            FontSize="20" 
                            FontAttributes="Bold"
                            TextColor="{DynamicResource PrimaryTextColor}"/>
                     
-                    <Button Text="☀️ Light Theme" 
-                            BackgroundColor="{DynamicResource PrimaryColor}"
-                            Clicked="LightTheme_Clicked"/>
-                    <Button Text="🌙 Dark Theme" 
-                            BackgroundColor="{DynamicResource PrimaryColor}"
-                            Clicked="DarkTheme_Clicked"/>
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="10">
+                        <Button Grid.Row="0" Grid.Column="0"
+                                Text="☀️ Light"
+                                BackgroundColor="{DynamicResource PrimaryColor}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="LightTheme_Clicked"/>
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Text="🌙 Dark"
+                                BackgroundColor="{DynamicResource PrimaryColor}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="DarkTheme_Clicked"/>
+                        <Button Grid.Row="1" Grid.Column="0"
+                                Text="🇺🇸 USMC"
+                                BackgroundColor="{DynamicResource PrimaryColor}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="USMCTheme_Clicked"/>
+                        <Button Grid.Row="1" Grid.Column="1"
+                                Text="🪖 Olive Drab"
+                                BackgroundColor="{DynamicResource PrimaryColor}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="OliveDrabTheme_Clicked"/>
+                        <Button Grid.Row="2" Grid.Column="0"
+                                Text="🌊 Ocean"
+                                BackgroundColor="{DynamicResource PrimaryColor}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="OceanTheme_Clicked"/>
+                        <Button Grid.Row="2" Grid.Column="1"
+                                Text="🌅 Sunset"
+                                BackgroundColor="{DynamicResource PrimaryColor}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Clicked="SunsetTheme_Clicked"/>
+                    </Grid>
                 </StackLayout>
             </Frame>
 
             <Frame BackgroundColor="{DynamicResource SurfaceColor}" 
                    CornerRadius="10" 
-                   Padding="15">
+                   Padding="15"
+                   HasShadow="True">
                 <StackLayout Spacing="10">
                     <Label Text="About" 
                            FontSize="20" 
                            FontAttributes="Bold"
                            TextColor="{DynamicResource PrimaryTextColor}"/>
                     <Label Text="IP Management Interface v1.0" 
+                           FontSize="16"
                            TextColor="{DynamicResource SecondaryTextColor}"/>
                     <Label Text="Manage your IoT devices from your iPhone" 
+                           FontSize="14"
+                           TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Label Text="Features:" 
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           Margin="0,10,0,0"
+                           TextColor="{DynamicResource PrimaryTextColor}"/>
+                    <Label Text="• Device discovery and management" 
+                           FontSize="12"
+                           TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Label Text="• Real-time status monitoring" 
+                           FontSize="12"
+                           TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Label Text="• Multiple device categories" 
+                           FontSize="12"
+                           TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Label Text="• Beautiful theme options" 
+                           FontSize="12"
                            TextColor="{DynamicResource SecondaryTextColor}"/>
                 </StackLayout>
             </Frame>

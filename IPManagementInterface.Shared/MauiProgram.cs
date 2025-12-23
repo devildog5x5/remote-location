@@ -35,11 +35,20 @@ public static class MauiProgram
         builder.Services.AddSingleton<DeviceTemplateService>();
         builder.Services.AddSingleton<ReportingService>();
         builder.Services.AddSingleton<SecurityService>();
-        builder.Services.AddSingleton<ThemeManager>();
+        builder.Services.AddSingleton<ThemeManager>(sp =>
+        {
+            var themeManager = new ThemeManager();
+            // Apply saved theme on startup
+            var savedTheme = themeManager.GetSavedTheme();
+            themeManager.ApplyTheme(savedTheme);
+            return themeManager;
+        });
 
         // Register ViewModels
         builder.Services.AddTransient<DashboardViewModel>();
         builder.Services.AddTransient<DiscoveryViewModel>();
+        builder.Services.AddTransient<StatisticsViewModel>();
+        builder.Services.AddTransient<HistoryViewModel>();
 
         // Register Views
         builder.Services.AddTransient<MainPage>();
@@ -47,6 +56,8 @@ public static class MauiProgram
         builder.Services.AddTransient<DeviceDetailsPage>();
         builder.Services.AddTransient<SettingsPage>(sp => 
             new SettingsPage(sp.GetRequiredService<ThemeManager>()));
+        builder.Services.AddTransient<StatisticsPage>();
+        builder.Services.AddTransient<HistoryPage>();
 
         return builder.Build();
     }
