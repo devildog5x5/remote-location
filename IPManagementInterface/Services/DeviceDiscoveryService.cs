@@ -14,6 +14,8 @@ namespace IPManagementInterface.Services
     {
         private readonly DeviceCommunicationService _communicationService;
         private readonly NetworkToolsService? _networkTools;
+        public event EventHandler<DiscoveryProgress>? ProgressUpdated;
+        public event EventHandler<IoTDevice>? DeviceDiscovered;
 
         public DeviceDiscoveryService(DeviceCommunicationService communicationService, NetworkToolsService? networkTools = null)
         {
@@ -27,19 +29,33 @@ namespace IPManagementInterface.Services
             int startHost = 1,
             int endHost = 254,
             IEnumerable<int>? customPorts = null,
+            DiscoveryProfile? profile = null,
+            IProgress<DiscoveryProgress>? progress = null,
             CancellationToken cancellationToken = default)
         {
             var discoveredDevices = new List<IoTDevice>();
-            var tasks = new List<Task>();
+            var progressInfo = new DiscoveryProgress
+            {
+                StartTime = DateTime.Now,
+                TotalHosts = (endHost - startHost + 1) * (customPorts?.Count() ?? 5) * 2, // hosts * ports * protocols
+                CurrentHost = 0
+            };
 
             // Get local network base IP
             var baseIp = GetLocalNetworkBase();
             if (string.IsNullOrEmpty(baseIp))
                 return discoveredDevices;
 
-            // Use custom ports or default ports
-            var ports = customPorts?.ToList() ?? new List<int> { 80, 443, 8000, 8080, 8443 };
-            var protocols = new[] { "http", "https" };
+            // Use profile or custom ports or default ports
+            var ports = profile?.Ports ?? customPorts?.ToList() ?? new List<int> { 80, 443, 8000, 8080, 8443 };
+            var protocols = profile?.Protocols?.ToList() ?? new List<string> { "http", "https" };
+            var timeout = profile?.TimeoutMs ?? 2000;
+            var maxConcurrent = profile?.MaxConcurrentScans ?? 50;
+            
+            var semaphore = new SemaphoreSlim(maxConcurrent, maxConcurrent);
+            var tasks = new List<Task>();
+            int scannedCount = 0;
+            object lockObject = new object();
 
             for (int host = startHost; host <= endHost; host++)
             {
@@ -56,24 +72,54 @@ namespace IPManagementInterface.Services
                         var localPort = port;
                         var localProtocol = protocol;
 
+                        await semaphore.WaitAsync(cancellationToken);
+                        
                         tasks.Add(Task.Run(async () =>
                         {
-                            if (await _communicationService.CheckDeviceStatusAsync(localIp, localPort, localProtocol, cancellationToken))
+                            try
                             {
-                                var device = await TryDiscoverDeviceAsync(localIp, localPort, localProtocol, deviceType, group, cancellationToken);
-                                if (device != null)
-                                {
-                                    // Try to get MAC address
-                                    if (_networkTools != null)
-                                    {
-                                        device.MacAddress = _networkTools.GetMacAddress(localIp);
-                                    }
+                                progressInfo.CurrentIp = localIp;
+                                progressInfo.StatusMessage = $"Scanning {localIp}:{localPort} ({localProtocol})...";
+                                progress?.Report(progressInfo);
+                                ProgressUpdated?.Invoke(this, progressInfo);
 
-                                    lock (discoveredDevices)
+                                if (await _communicationService.CheckDeviceStatusAsync(localIp, localPort, localProtocol, cancellationToken))
+                                {
+                                    var device = await TryDiscoverDeviceAsync(localIp, localPort, localProtocol, deviceType, group, cancellationToken);
+                                    if (device != null)
                                     {
-                                        discoveredDevices.Add(device);
+                                        // Try to get MAC address
+                                        if (_networkTools != null)
+                                        {
+                                            device.MacAddress = _networkTools.GetMacAddress(localIp);
+                                        }
+
+                                        lock (discoveredDevices)
+                                        {
+                                            discoveredDevices.Add(device);
+                                            progressInfo.FoundDevices = discoveredDevices.Count;
+                                            progressInfo.RecentDiscoveries.Insert(0, $"{device.Name} ({device.IpAddress})");
+                                            if (progressInfo.RecentDiscoveries.Count > 10)
+                                            {
+                                                progressInfo.RecentDiscoveries.RemoveAt(progressInfo.RecentDiscoveries.Count - 1);
+                                            }
+                                        }
+
+                                        DeviceDiscovered?.Invoke(this, device);
                                     }
                                 }
+                            }
+                            finally
+                            {
+                                lock (lockObject)
+                                {
+                                    scannedCount++;
+                                    progressInfo.ScannedHosts = scannedCount;
+                                    progressInfo.CurrentHost = scannedCount;
+                                }
+                                progress?.Report(progressInfo);
+                                ProgressUpdated?.Invoke(this, progressInfo);
+                                semaphore.Release();
                             }
                         }, cancellationToken));
                     }
@@ -81,6 +127,12 @@ namespace IPManagementInterface.Services
             }
 
             await Task.WhenAll(tasks);
+            
+            progressInfo.IsComplete = true;
+            progressInfo.StatusMessage = $"Discovery complete! Found {discoveredDevices.Count} device(s)";
+            progress?.Report(progressInfo);
+            ProgressUpdated?.Invoke(this, progressInfo);
+            
             return discoveredDevices;
         }
 

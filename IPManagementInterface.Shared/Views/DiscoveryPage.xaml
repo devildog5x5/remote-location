@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:IPManagementInterface.Shared.ViewModels"
+             x:Class="IPManagementInterface.Shared.Views.DiscoveryPage"
+             Title="Network Discovery"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+            
+            <!-- Configuration -->
+            <Frame BackgroundColor="{DynamicResource SurfaceColor}" 
+                   CornerRadius="10" 
+                   Padding="15">
+                <StackLayout Spacing="10">
+                    <Label Text="Discovery Configuration" 
+                           FontSize="20" 
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}"/>
+                    
+                    <Label Text="IP Range" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="10">
+                        <Entry Grid.Column="0"
+                               Text="{Binding StartIp}"
+                               Placeholder="192.168.1.1"
+                               Keyboard="Default"/>
+                        <Label Grid.Column="1" 
+                               Text="to" 
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center"
+                               TextColor="{DynamicResource SecondaryTextColor}"/>
+                        <Entry Grid.Column="2"
+                               Text="{Binding EndIp}"
+                               Placeholder="192.168.1.254"
+                               Keyboard="Default"/>
+                    </Grid>
+
+                    <Label Text="Ports (comma-separated)" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Entry Text="{Binding Ports}"
+                           Placeholder="80,443,8000,8080"
+                           Keyboard="Numeric"/>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <CheckBox Grid.Column="0" 
+                                  IsChecked="{Binding UseHttp}"
+                                  Color="{DynamicResource PrimaryColor}"/>
+                        <Label Grid.Column="0" 
+                               Text="HTTP" 
+                               VerticalOptions="Center"
+                               Margin="30,0,0,0"/>
+                        <CheckBox Grid.Column="1" 
+                                  IsChecked="{Binding UseHttps}"
+                                  Color="{DynamicResource PrimaryColor}"/>
+                        <Label Grid.Column="1" 
+                               Text="HTTPS" 
+                               VerticalOptions="Center"
+                               Margin="30,0,0,0"/>
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <!-- Progress -->
+            <Frame BackgroundColor="{DynamicResource SurfaceColor}" 
+                   CornerRadius="10" 
+                   Padding="15"
+                   IsVisible="{Binding IsDiscovering}">
+                <StackLayout Spacing="10">
+                    <Label Text="Discovery Progress" 
+                           FontSize="18" 
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}"/>
+                    
+                    <ProgressBar Progress="{Binding Progress}" 
+                                  ProgressColor="{DynamicResource PrimaryColor}"/>
+                    
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <StackLayout Grid.Column="0">
+                            <Label Text="Scanned" 
+                                   FontSize="12" 
+                                   TextColor="{DynamicResource SecondaryTextColor}"/>
+                            <Label Text="{Binding ScannedCount}" 
+                                   FontSize="24" 
+                                   FontAttributes="Bold"
+                                   TextColor="{DynamicResource PrimaryColor}"/>
+                        </StackLayout>
+                        <StackLayout Grid.Column="1">
+                            <Label Text="Found" 
+                                   FontSize="12" 
+                                   TextColor="{DynamicResource SecondaryTextColor}"/>
+                            <Label Text="{Binding FoundCount}" 
+                                   FontSize="24" 
+                                   FontAttributes="Bold"
+                                   TextColor="{DynamicResource SuccessColor}"/>
+                        </StackLayout>
+                    </Grid>
+
+                    <Label Text="{Binding StatusMessage}" 
+                           FontSize="14"
+                           TextColor="{DynamicResource SecondaryTextColor}"
+                           LineBreakMode="WordWrap"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Action Buttons -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Button Grid.Column="0"
+                        Text="{Binding StartStopButtonText}"
+                        BackgroundColor="{Binding StartStopButtonColor}"
+                        TextColor="White"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        Clicked="StartStopButton_Clicked"/>
+                <Button Grid.Column="1"
+                        Text="Add All"
+                        BackgroundColor="{DynamicResource AccentColor}"
+                        TextColor="White"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        IsEnabled="{Binding HasDiscoveredDevices}"
+                        Clicked="AddAllButton_Clicked"/>
+            </Grid>
+
+            <!-- Recent Discoveries -->
+            <Frame BackgroundColor="{DynamicResource SurfaceColor}" 
+                   CornerRadius="10" 
+                   Padding="15">
+                <StackLayout Spacing="10">
+                    <Label Text="Recent Discoveries" 
+                           FontSize="18" 
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}"/>
+                    
+                    <CollectionView ItemsSource="{Binding DiscoveredDevices}"
+                                    HeightRequest="300">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="10" ColumnDefinitions="*,Auto">
+                                    <StackLayout Grid.Column="0" Spacing="2">
+                                        <Label Text="{Binding Name}" 
+                                               FontSize="16" 
+                                               FontAttributes="Bold"
+                                               TextColor="{DynamicResource PrimaryTextColor}"/>
+                                        <Label Text="{Binding IpAddress}" 
+                                               FontSize="14"
+                                               TextColor="{DynamicResource SecondaryTextColor}"/>
+                                    </StackLayout>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding DeviceType}"
+                                           FontSize="12"
+                                           TextColor="{DynamicResource SecondaryTextColor}"
+                                           VerticalOptions="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </Frame>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

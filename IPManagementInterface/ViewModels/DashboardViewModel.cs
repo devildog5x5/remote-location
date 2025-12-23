@@ -130,7 +130,12 @@ namespace IPManagementInterface.ViewModels
             };
         }
 
-        private void LoadDevices()
+        // Public accessors for services (needed by UI)
+        public DeviceDiscoveryService GetDiscoveryService() => _discoveryService;
+        public DeviceManagerService GetDeviceManager() => _deviceManager;
+        public DeviceHistoryService GetHistoryService() => _historyService;
+
+        public void LoadDevices()
         {
             AllDevices.Clear();
             CameraDevices.Clear();

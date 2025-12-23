@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:IPManagementInterface.Shared.Models"
+             x:Class="IPManagementInterface.Shared.Views.DeviceDetailsPage"
+             Title="Device Details"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+            
+            <Frame BackgroundColor="{DynamicResource SurfaceColor}" 
+                   CornerRadius="10" 
+                   Padding="15">
+                <StackLayout Spacing="10">
+                    <Label Text="{Binding Device.Name}" 
+                           FontSize="24" 
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}"/>
+                    <Label Text="{Binding Device.IpAddress}" 
+                           FontSize="18"
+                           TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Label Text="{Binding Device.Status}" 
+                           FontSize="16"
+                           TextColor="{Binding Device.Status, Converter={StaticResource StatusToColorConverter}}"/>
+                </StackLayout>
+            </Frame>
+
+            <Frame BackgroundColor="{DynamicResource SurfaceColor}" 
+                   CornerRadius="10" 
+                   Padding="15">
+                <StackLayout Spacing="10">
+                    <Label Text="Device Information" 
+                           FontSize="18" 
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}"/>
+                    
+                    <Label Text="Port" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Label Text="{Binding Device.Port}" FontSize="16" TextColor="{DynamicResource PrimaryTextColor}"/>
+                    
+                    <Label Text="Protocol" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Label Text="{Binding Device.Protocol}" FontSize="16" TextColor="{DynamicResource PrimaryTextColor}"/>
+                    
+                    <Label Text="Device Type" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}"/>
+                    <Label Text="{Binding Device.DeviceType}" FontSize="16" TextColor="{DynamicResource PrimaryTextColor}"/>
+                </StackLayout>
+            </Frame>
+
+            <Button Text="🔄 Refresh Status" 
+                    BackgroundColor="{DynamicResource PrimaryColor}"
+                    TextColor="White"
+                    IsEnabled="{Binding Device, Converter={StaticResource IsNotNullConverter}}"
+                    Clicked="RefreshButton_Clicked"/>
+            
+            <Button Text="🏓 Ping Device" 
+                    BackgroundColor="{DynamicResource AccentColor}"
+                    TextColor="White"
+                    IsEnabled="{Binding Device, Converter={StaticResource IsNotNullConverter}}"
+                    Clicked="PingButton_Clicked"/>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

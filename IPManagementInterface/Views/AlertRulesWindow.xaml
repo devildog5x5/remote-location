@@ -19,10 +19,12 @@
                    Foreground="{DynamicResource TextPrimaryBrush}"
                    Margin="0,0,0,15"/>
 
-        <DataGrid Grid.Row="1"
+        <DataGrid x:Name="AlertRulesDataGrid"
+                  Grid.Row="1"
                   ItemsSource="{Binding AlertRules}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
+                  SelectionMode="Single"
                   Background="{DynamicResource SurfaceBrush}"
                   BorderBrush="{DynamicResource BorderBrush}">
             <DataGrid.Columns>
@@ -43,6 +45,13 @@
                     Height="35"
                     Margin="5,0"
                     Background="{DynamicResource AccentBrush}"
+                    Foreground="White"/>
+            <Button Content="Remove Selected" 
+                    Click="RemoveRuleButton_Click"
+                    Width="120"
+                    Height="35"
+                    Margin="5,0"
+                    Background="{DynamicResource ErrorBrush}"
                     Foreground="White"/>
             <Button Content="Close" 
                     Click="CloseButton_Click"

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:IPManagementInterface.Shared.ViewModels"
+             xmlns:models="clr-namespace:IPManagementInterface.Shared.Models"
+             x:Class="IPManagementInterface.Shared.Views.MainPage"
+             Title="IP Management Dashboard"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="10">
+        
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+            <Label Text="🔍 IP Management" 
+                   FontSize="28" 
+                   FontAttributes="Bold"
+                   TextColor="{DynamicResource PrimaryTextColor}"
+                   VerticalOptions="Center"/>
+            <Button Grid.Column="1"
+                    Text="⚙️"
+                    FontSize="24"
+                    WidthRequest="50"
+                    HeightRequest="50"
+                    CornerRadius="25"
+                    BackgroundColor="{DynamicResource PrimaryColor}"
+                    TextColor="White"
+                    Clicked="SettingsButton_Clicked"/>
+        </Grid>
+
+        <!-- Search Bar -->
+        <SearchBar Grid.Row="1"
+                   Text="{Binding SearchText}"
+                   Placeholder="Search devices..."
+                   Margin="0,0,0,10"
+                   BackgroundColor="{DynamicResource SurfaceColor}"
+                   TextColor="{DynamicResource PrimaryTextColor}"/>
+
+        <!-- Device List -->
+        <RefreshView Grid.Row="2" 
+                     IsRefreshing="{Binding IsRefreshing}"
+                     Command="{Binding RefreshAllCommand}">
+            <CollectionView ItemsSource="{Binding FilteredDevices}"
+                            SelectionMode="Single"
+                            SelectedItem="{Binding SelectedDevice}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:IoTDevice">
+                        <Grid Padding="10" ColumnDefinitions="Auto,*,Auto,Auto">
+                            <Frame Grid.Column="0"
+                                   BackgroundColor="{Binding Status, Converter={StaticResource StatusToColorConverter}}"
+                                   CornerRadius="5"
+                                   WidthRequest="10"
+                                   HeightRequest="10"
+                                   Margin="0,0,10,0"/>
+                            <StackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="{Binding Name}" 
+                                       FontSize="18" 
+                                       FontAttributes="Bold"
+                                       TextColor="{DynamicResource PrimaryTextColor}"/>
+                                <Label Text="{Binding IpAddress}" 
+                                       FontSize="14"
+                                       TextColor="{DynamicResource SecondaryTextColor}"/>
+                                <Label Text="{Binding DeviceType}" 
+                                       FontSize="12"
+                                       TextColor="{DynamicResource SecondaryTextColor}"/>
+                            </StackLayout>
+                            <Label Grid.Column="2"
+                                   Text="⭐"
+                                   FontSize="20"
+                                   IsVisible="{Binding IsFavorite}"
+                                   Margin="5,0"/>
+                            <Button Grid.Column="3"
+                                    Text="→"
+                                    FontSize="20"
+                                    WidthRequest="40"
+                                    HeightRequest="40"
+                                    CornerRadius="20"
+                                    BackgroundColor="{DynamicResource AccentColor}"
+                                    TextColor="White"
+                                    Clicked="DeviceDetails_Clicked"
+                                    CommandParameter="{Binding .}"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Floating Action Buttons -->
+        <Grid Grid.Row="2" 
+              HorizontalOptions="End" 
+              VerticalOptions="End"
+              Margin="0,0,20,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0"
+                    Text="🔍"
+                    FontSize="24"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    CornerRadius="30"
+                    BackgroundColor="{DynamicResource AccentColor}"
+                    TextColor="White"
+                    Clicked="DiscoverButton_Clicked"
+                    Margin="0,0,0,10"/>
+            <Button Grid.Row="1"
+                    Text="➕"
+                    FontSize="24"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    CornerRadius="30"
+                    BackgroundColor="{DynamicResource PrimaryColor}"
+                    TextColor="White"
+                    Clicked="AddDeviceButton_Clicked"/>
+        </Grid>
+
+    </Grid>
+</ContentPage>

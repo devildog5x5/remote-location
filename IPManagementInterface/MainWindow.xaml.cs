@@ -85,5 +85,17 @@ namespace IPManagementInterface
                 _viewModel.BulkAssignGroupCommand.Execute(inputDialog.ResponseText);
             }
         }
+
+        private void DiscoverButton_Click(object sender, RoutedEventArgs e)
+        {
+            var discoveryWindow = new Views.DiscoveryWindow(
+                _viewModel.GetDiscoveryService(),
+                _viewModel.GetDeviceManager(),
+                _viewModel.GetHistoryService());
+            discoveryWindow.ShowDialog();
+            // Refresh devices after discovery
+            var loadMethod = typeof(DashboardViewModel).GetMethod("LoadDevices", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            loadMethod?.Invoke(_viewModel, null);
+        }
     }
 }

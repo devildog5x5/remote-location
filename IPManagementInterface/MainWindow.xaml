@@ -113,11 +113,12 @@
                         </StackPanel>
                     </Button>
                     <Button Content="🔍 Discover" 
-                            Command="{Binding DiscoverDevicesCommand}"
+                            Click="DiscoverButton_Click"
                             Margin="5,0"
                             Background="{DynamicResource AccentBrush}"
                             Foreground="White"
-                            Padding="15,8"/>
+                            Padding="15,8"
+                            ToolTip="Open Advanced Discovery Window"/>
                     <Button Content="➕ Add" 
                             Command="{Binding AddDeviceCommand}"
                             Margin="5,0"
