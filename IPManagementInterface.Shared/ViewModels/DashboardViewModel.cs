@@ -74,18 +74,18 @@ public partial class DashboardViewModel : ObservableObject
     {
         switch (device.DeviceType)
         {
-            case DeviceType.Camera:
+            case Models.DeviceType.Camera:
                 if (!CameraDevices.Contains(device))
                     CameraDevices.Add(device);
                 break;
-            case DeviceType.Router:
-            case DeviceType.Switch:
-            case DeviceType.AccessPoint:
+            case Models.DeviceType.Router:
+            case Models.DeviceType.Switch:
+            case Models.DeviceType.AccessPoint:
                 if (!NetworkDevices.Contains(device))
                     NetworkDevices.Add(device);
                 break;
-            case DeviceType.Server:
-            case DeviceType.Printer:
+            case Models.DeviceType.Server:
+            case Models.DeviceType.Printer:
                 if (!ServerDevices.Contains(device))
                     ServerDevices.Add(device);
                 break;
@@ -161,7 +161,7 @@ public partial class DashboardViewModel : ObservableObject
             IpAddress = "192.168.1.1",
             Port = 80,
             Protocol = "http",
-            DeviceType = DeviceType.Other,
+            DeviceType = Models.DeviceType.Other,
             FirstSeen = DateTime.Now
         };
 

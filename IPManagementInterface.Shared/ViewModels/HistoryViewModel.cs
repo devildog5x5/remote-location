@@ -23,7 +23,7 @@ public partial class HistoryViewModel : ObservableObject
         LoadHistory();
     }
 
-    private void LoadHistory()
+    public void LoadHistory()
     {
         HistoryItems.Clear();
         var history = _historyService.GetRecentHistory(100);

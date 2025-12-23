@@ -163,16 +163,15 @@
                                 TextColor="{DynamicResource PrimaryTextColor}"/>
                     </StackLayout>
                     
-                    <CheckBox IsChecked="{Binding Device.IsFavorite}"
-                              Color="{DynamicResource PrimaryColor}">
-                        <CheckBox.Content>
-                            <Label Text="⭐ Favorite"
-                                   FontSize="16"
-                                   TextColor="{DynamicResource PrimaryTextColor}"
-                                   VerticalOptions="Center"
-                                   Margin="10,0,0,0"/>
-                        </CheckBox.Content>
-                    </CheckBox>
+                    <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                        <CheckBox IsChecked="{Binding Device.IsFavorite}"
+                                  Color="{DynamicResource PrimaryColor}"
+                                  VerticalOptions="Center"/>
+                        <Label Text="⭐ Favorite"
+                               FontSize="16"
+                               TextColor="{DynamicResource PrimaryTextColor}"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
                 </StackLayout>
             </Frame>
 

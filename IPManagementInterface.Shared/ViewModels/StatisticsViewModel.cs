@@ -61,22 +61,22 @@ public partial class StatisticsViewModel : ObservableObject
         UnknownDevices = devices.Count(d => d.Status == DeviceStatus.Unknown);
 
         // By category
-        var cameras = devices.Where(d => d.DeviceType == DeviceType.Camera).ToList();
+        var cameras = devices.Where(d => d.DeviceType == Models.DeviceType.Camera).ToList();
         CameraCount = cameras.Count;
         CameraOnlineCount = cameras.Count(d => d.Status == DeviceStatus.Online);
 
-        var network = devices.Where(d => d.DeviceType == DeviceType.Router || 
-                                          d.DeviceType == DeviceType.Switch || 
-                                          d.DeviceType == DeviceType.AccessPoint).ToList();
+        var network = devices.Where(d => d.DeviceType == Models.DeviceType.Router || 
+                                          d.DeviceType == Models.DeviceType.Switch || 
+                                          d.DeviceType == Models.DeviceType.AccessPoint).ToList();
         NetworkCount = network.Count;
         NetworkOnlineCount = network.Count(d => d.Status == DeviceStatus.Online);
 
-        var servers = devices.Where(d => d.DeviceType == DeviceType.Server || 
-                                         d.DeviceType == DeviceType.Printer).ToList();
+        var servers = devices.Where(d => d.DeviceType == Models.DeviceType.Server || 
+                                         d.DeviceType == Models.DeviceType.Printer).ToList();
         ServerCount = servers.Count;
         ServerOnlineCount = servers.Count(d => d.Status == DeviceStatus.Online);
 
-        var other = devices.Where(d => d.DeviceType == DeviceType.Other).ToList();
+        var other = devices.Where(d => d.DeviceType == Models.DeviceType.Other).ToList();
         OtherCount = other.Count;
         OtherOnlineCount = other.Count(d => d.Status == DeviceStatus.Online);
     }
