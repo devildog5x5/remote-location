@@ -18,8 +18,8 @@
     
     <MediaTemplate EmbedCab="yes" />
     
-    <!-- Application Icon -->
-    <Icon Id="AppIcon" SourceFile="IPManagementInterface\Resources\TestWrrior.ico"/>
+    <!-- Application Icon (for Add/Remove Programs) -->
+    <Icon Id="AppIcon" SourceFile="IPManagementInterface\bin\Release\net8.0-windows\win-x64\publish\IPManagementInterface.exe"/>
     <Property Id="ARPPRODUCTICON" Value="AppIcon" />
     
     <!-- Install Directory -->
@@ -34,15 +34,11 @@
                         Directory="ApplicationProgramsFolder"
                         Name="IP Management Interface"
                         WorkingDirectory="INSTALLFOLDER"
-                        Icon="AppIcon"
-                        IconIndex="0"
                         Advertise="yes"/>
               <Shortcut Id="ApplicationDesktopShortcut"
                         Directory="DesktopFolder"
                         Name="IP Management Interface"
                         WorkingDirectory="INSTALLFOLDER"
-                        Icon="AppIcon"
-                        IconIndex="0"
                         Advertise="yes"/>
             </File>
           </Component>
@@ -51,7 +47,12 @@
       
       <!-- Start Menu Folder -->
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsFolder" Name="IP Management Interface"/>
+        <Directory Id="ApplicationProgramsFolder" Name="IP Management Interface">
+          <Component Id="StartMenuShortcut" Guid="C2D3E4F5-A6B7-4C8D-9E0F-1A2B3C4D5E6F">
+            <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+            <RegistryValue Root="HKCU" Key="Software\IPManagementInterface" Name="Installed" Type="integer" Value="1" KeyPath="yes"/>
+          </Component>
+        </Directory>
       </Directory>
       
       <!-- Desktop Folder -->
@@ -61,14 +62,11 @@
     <!-- Features -->
     <Feature Id="MainFeature" Title="IP Management Interface" Level="1">
       <ComponentRef Id="ApplicationFiles" />
-      <ComponentRef Id="RegistryEntries" />
+      <ComponentRef Id="StartMenuShortcut" />
     </Feature>
     
     <!-- UI -->
     <UIRef Id="WixUI_InstallDir" />
-    <WixVariable Id="WixUILicenseRtf" Value="" />
-    <WixVariable Id="WixUIBannerBmp" Value="" />
-    <WixVariable Id="WixUIDialogBmp" Value="" />
     
     <!-- Set INSTALLFOLDER property -->
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
