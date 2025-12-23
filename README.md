@@ -1,6 +1,6 @@
 # IP Management Dashboard
 
-A modern Windows dashboard application for managing IoT devices such as IP Cameras and other IP-based devices. Built with WPF and C#.
+A modern multi-platform dashboard application for managing IoT devices such as IP Cameras and other IP-based devices. Available for **Windows** (WPF) and **iOS** (.NET MAUI).
 
 ## Features
 
@@ -32,11 +32,38 @@ A modern Windows dashboard application for managing IoT devices such as IP Camer
 
 ## Building
 
-### For Development
+### Windows Application
+
+#### For Development
 1. Open `IPManagementInterface.sln` in Visual Studio 2022 or later
 2. Restore NuGet packages
 3. Build the solution (Ctrl+Shift+B)
 4. Run the application (F5)
+
+### iOS Application
+
+#### Prerequisites
+- macOS with Xcode 14.0+
+- .NET 9.0 SDK
+- Apple Developer account (for device deployment)
+
+#### Quick Start
+1. See [README_iOS_SETUP.md](README_iOS_SETUP.md) for detailed setup instructions
+2. Open `IPManagementInterface.Mobile.sln` in Visual Studio for Mac
+3. Set `IPManagementInterface.iOS` as startup project
+4. Build and run (F5)
+
+#### Build Scripts
+```powershell
+# Check requirements
+.\CheckIOSRequirements.ps1
+
+# Build iOS app
+.\BuildIOS.ps1 -Configuration Debug
+
+# Automated setup (macOS)
+./SetupIOS.sh
+```
 
 ### For Distribution (Self-Contained - Works on Older Windows)
 Run the publish script to create a self-contained executable that works on Windows 7 SP1+:

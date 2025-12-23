@@ -2,6 +2,8 @@
 
 This is the iOS version of the IP Management Interface application, built using .NET MAUI (Multi-platform App UI) to share code with the Windows version.
 
+> **📖 For detailed setup instructions, see [README_iOS_SETUP.md](../README_iOS_SETUP.md)**
+
 ## Features
 
 - **Device Discovery**: Scan your local network for IoT devices
