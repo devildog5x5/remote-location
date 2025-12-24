@@ -105,3 +105,16 @@ $tf/
 
 # Application data
 AppData/
+
+# Installer packages and large files
+*.exe
+*.msi
+*.zip
+*Installer*/
+InstallerOutput/
+*-Installer-*/
+
+# Large build artifacts
+*.dll
+*.r2r.dll
+publish/
