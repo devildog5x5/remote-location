@@ -2,6 +2,18 @@
 
 A modern multi-platform dashboard application for managing IoT devices such as IP Cameras and other IP-based devices. Available for **Windows** (WPF) and **iOS** (.NET MAUI).
 
+## Downloads
+
+**[📥 Download Page →](DOWNLOAD.md)** - Complete download guide with all executables and installers
+
+### Quick Downloads
+
+- **[MSI Installer (Recommended)](https://github.com/devildog5x5/remote-location/releases/latest/download/IPManagementInterface-Setup.msi)** - Professional Windows installer
+- **[Self-Contained Executable](https://github.com/devildog5x5/remote-location/releases/latest/download/IPManagementInterface.exe)** - Portable executable (works on Windows 7 SP1+)
+- **[Portable Package](https://github.com/devildog5x5/remote-location/releases/latest/download/IPManagementInterface-Installer-v1.0.0.zip)** - ZIP archive with setup scripts
+
+**Repository:** [https://github.com/devildog5x5/remote-location](https://github.com/devildog5x5/remote-location)
+
 ## Features
 
 - **Dashboard Interface**: Tabbed view organized by device types (Cameras, Network, Servers, Other)
