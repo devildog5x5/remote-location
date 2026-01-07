@@ -104,11 +104,13 @@ These repositories exist but may need releases created or assets uploaded:
 
 1. **PTZCameraControl.exe** - Self-Contained Executable (~414 MB)
    - **Link:** https://github.com/devildog5x5/PTZ_Interface/releases/download/PTZCameraControlTag/PTZCameraControl.exe
-   - **Description:** Self-contained executable for PTZ Camera Control. Includes .NET 8.0 runtime and all dependencies bundled into a single file. No additional installation required - just download and run. Publisher: Robert Foster.
+   - **Description:** Self-contained executable for PTZ Camera Control with Dark Warrior theme (matching TestEnvironmentBuilder style). Includes .NET 8.0 runtime and all dependencies bundled into a single file. Features Spartan helmet icon, gold accent colors, and Robert Foster signature throughout. No additional installation required - just download and run. Publisher: Robert Foster.
 
-**Features:** Full PTZ control (Pan, Tilt, Zoom), ONVIF Profile S support, live video streaming via RTSP/LibVLC, auto stream detection, absolute positioning, home position, modern dark theme UI with Electric Blue, Competition Orange, and Racing Red accents
+**Features:** Full PTZ control (Pan, Tilt, Zoom), ONVIF Profile S support, live video streaming via RTSP/LibVLC, auto stream detection, absolute positioning, home position, Dark Warrior theme UI (matching TestEnvironmentBuilder) with Spartan helmet icon and gold accents
 
 **Requirements:** Windows 10/11 (64-bit), ONVIF Profile S compatible PTZ camera, Network connection to camera
+
+**Theme:** Dark Warrior theme with Spartan helmet icon, gold accents (#f0a500), and professional card-based layout matching TestEnvironmentBuilder style
 
 ---
 
@@ -121,7 +123,7 @@ These repositories exist but may need releases created or assets uploaded:
 | **Video Editor C#** | [Repo](https://github.com/devildog5x5/VideoEditor-CSharp) | [Releases](https://github.com/devildog5x5/VideoEditor-CSharp/releases) | [Releases](https://github.com/devildog5x5/VideoEditor-CSharp/releases) | ⚠️ Check releases |
 | **Video Editor Python** | [Repo](https://github.com/devildog5x5/VideoEditor-Python) | [Releases](https://github.com/devildog5x5/VideoEditor-Python/releases) | [Releases](https://github.com/devildog5x5/VideoEditor-Python/releases) | ⚠️ Check releases |
 | **Test Environment Builder** | [Repo](https://github.com/devildog5x5/TestEnvironmentBuilder) | [Releases](https://github.com/devildog5x5/TestEnvironmentBuilder/releases) | [Releases](https://github.com/devildog5x5/TestEnvironmentBuilder/releases) | ⚠️ Check releases |
-| **PTZ Camera Control** | [Repo](https://github.com/devildog5x5/PTZ_Interface) | [Releases](https://github.com/devildog5x5/PTZ_Interface/releases) | [EXE (414 MB)](https://github.com/devildog5x5/PTZ_Interface/releases/download/PTZCameraControlTag/PTZCameraControl.exe) | ✅ Active Release |
+| **PTZ Camera Control** | [Repo](https://github.com/devildog5x5/PTZ_Interface) | [Releases](https://github.com/devildog5x5/PTZ_Interface/releases) | [EXE (414 MB)](https://github.com/devildog5x5/PTZ_Interface/releases/download/PTZCameraControlTag/PTZCameraControl.exe) | ✅ Active - Dark Warrior Theme |
 
 ---
 
