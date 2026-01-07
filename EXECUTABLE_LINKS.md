@@ -100,20 +100,15 @@ These repositories exist but may need releases created or assets uploaded:
 **Releases:** https://github.com/devildog5x5/PTZ_Interface/releases  
 **Latest Release:** PTZ Camera Control (Dec 10, 2025)
 
-**Download Links:**
-*Note: The release exists but no executable or installer assets have been uploaded yet. Check the releases page for updates.*
+#### Direct Download Links:
 
-**Repository Links:**
-- Repository: https://github.com/devildog5x5/PTZ_Interface
-- Releases: https://github.com/devildog5x5/PTZ_Interface/releases
+1. **PTZCameraControl.exe** - Self-Contained Executable (~414 MB)
+   - **Link:** https://github.com/devildog5x5/PTZ_Interface/releases/download/PTZCameraControlTag/PTZCameraControl.exe
+   - **Description:** Self-contained executable for PTZ Camera Control. Includes .NET 8.0 runtime and all dependencies bundled into a single file. No additional installation required - just download and run. Publisher: Robert Foster.
 
-**Expected Files (when available):**
-- `PTZCameraControlSetup-1.0.0.exe` - Windows Installer (Professional Windows installer for PTZ Camera Control. Includes .NET 8.0 Runtime installation prompts, Start Menu shortcuts, and standard Windows installation options. Publisher: Robert Foster.)
-- Executable file (standalone or self-contained)
+**Features:** Full PTZ control (Pan, Tilt, Zoom), ONVIF Profile S support, live video streaming via RTSP/LibVLC, auto stream detection, absolute positioning, home position, modern dark theme UI with Electric Blue, Competition Orange, and Racing Red accents
 
-**Features:** Full PTZ control (Pan, Tilt, Zoom), ONVIF Profile S support, live video streaming via RTSP, auto stream detection, absolute positioning, home position, modern dark theme UI
-
-**Requirements:** Windows 10/11 (64-bit), .NET 8.0 Runtime, ONVIF Profile S compatible PTZ camera
+**Requirements:** Windows 10/11 (64-bit), ONVIF Profile S compatible PTZ camera, Network connection to camera
 
 ---
 
@@ -126,7 +121,7 @@ These repositories exist but may need releases created or assets uploaded:
 | **Video Editor C#** | [Repo](https://github.com/devildog5x5/VideoEditor-CSharp) | [Releases](https://github.com/devildog5x5/VideoEditor-CSharp/releases) | [Releases](https://github.com/devildog5x5/VideoEditor-CSharp/releases) | ⚠️ Check releases |
 | **Video Editor Python** | [Repo](https://github.com/devildog5x5/VideoEditor-Python) | [Releases](https://github.com/devildog5x5/VideoEditor-Python/releases) | [Releases](https://github.com/devildog5x5/VideoEditor-Python/releases) | ⚠️ Check releases |
 | **Test Environment Builder** | [Repo](https://github.com/devildog5x5/TestEnvironmentBuilder) | [Releases](https://github.com/devildog5x5/TestEnvironmentBuilder/releases) | [Releases](https://github.com/devildog5x5/TestEnvironmentBuilder/releases) | ⚠️ Check releases |
-| **PTZ Camera Control** | [Repo](https://github.com/devildog5x5/PTZ_Interface) | [Releases](https://github.com/devildog5x5/PTZ_Interface/releases) | [Releases](https://github.com/devildog5x5/PTZ_Interface/releases) | ⚠️ No assets uploaded |
+| **PTZ Camera Control** | [Repo](https://github.com/devildog5x5/PTZ_Interface) | [Releases](https://github.com/devildog5x5/PTZ_Interface/releases) | [EXE (414 MB)](https://github.com/devildog5x5/PTZ_Interface/releases/download/PTZCameraControlTag/PTZCameraControl.exe) | ✅ Active Release |
 
 ---
 
