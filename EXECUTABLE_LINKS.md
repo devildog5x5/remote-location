@@ -103,7 +103,7 @@ These repositories exist but may need releases created or assets uploaded:
 #### Direct Download Links:
 
 1. **PTZCameraControlSetup-1.0.0.exe** - Windows Installer
-   - **Link:** https://github.com/devildog5x5/PTZ_Interface/releases/download/PTZ-Camera-Control/PTZCameraControlSetup-1.0.0.exe
+   - **Link:** https://github.com/devildog5x5/PTZ_Interface/releases/download/PTZCameraControlTag/PTZCameraControlSetup-1.0.0.exe
    - **Description:** Professional Windows installer for PTZ Camera Control. Includes .NET 8.0 Runtime installation prompts, Start Menu shortcuts, and standard Windows installation options. Publisher: Robert Foster.
 
 **Features:** Full PTZ control (Pan, Tilt, Zoom), ONVIF Profile S support, live video streaming via RTSP, auto stream detection, absolute positioning, home position, modern dark theme UI
@@ -121,7 +121,7 @@ These repositories exist but may need releases created or assets uploaded:
 | **Video Editor C#** | [Repo](https://github.com/devildog5x5/VideoEditor-CSharp) | [Releases](https://github.com/devildog5x5/VideoEditor-CSharp/releases) | [Releases](https://github.com/devildog5x5/VideoEditor-CSharp/releases) | ⚠️ Check releases |
 | **Video Editor Python** | [Repo](https://github.com/devildog5x5/VideoEditor-Python) | [Releases](https://github.com/devildog5x5/VideoEditor-Python/releases) | [Releases](https://github.com/devildog5x5/VideoEditor-Python/releases) | ⚠️ Check releases |
 | **Test Environment Builder** | [Repo](https://github.com/devildog5x5/TestEnvironmentBuilder) | [Releases](https://github.com/devildog5x5/TestEnvironmentBuilder/releases) | [Releases](https://github.com/devildog5x5/TestEnvironmentBuilder/releases) | ⚠️ Check releases |
-| **PTZ Camera Control** | [Repo](https://github.com/devildog5x5/PTZ_Interface) | [Installer](https://github.com/devildog5x5/PTZ_Interface/releases/download/PTZ-Camera-Control/PTZCameraControlSetup-1.0.0.exe) | [Releases](https://github.com/devildog5x5/PTZ_Interface/releases) | ✅ Active Release |
+| **PTZ Camera Control** | [Repo](https://github.com/devildog5x5/PTZ_Interface) | [Installer](https://github.com/devildog5x5/PTZ_Interface/releases/download/PTZCameraControlTag/PTZCameraControlSetup-1.0.0.exe) | [Releases](https://github.com/devildog5x5/PTZ_Interface/releases) | ✅ Active Release |
 
 ---
 
